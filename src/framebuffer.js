@@ -53,6 +53,5 @@ function array_to_frame(frameBuffer) {
             ctx.fillStyle = colorRGB2Hex(color);
             ctx.fillRect(x, y, 1, 1);
         }
-        
     }
 }

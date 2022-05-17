@@ -6,7 +6,7 @@ main();
 
 function main() {
 
-    var frameBuffer = new FrameBuffer(width, height, new Color(1, 1, 1, 1));
+    var frameBuffer = new FrameBuffer(width, height, new Color(1, 0, 1, 1));
     array_to_frame(frameBuffer)
 
 }
