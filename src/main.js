@@ -1,6 +1,9 @@
-
-var width = 400;
-var height = 400;
+canvas = document.querySelector('canvas');
+ctx = canvas.getContext('2d');
+width = canvas.width = canvas.clientWidth;
+height = canvas.height = canvas.clientHeight;
+imgData = ctx.getImageData(0,0,width,height);
+data = imgData.data;
 
 var vert = [
     vec2(0,0),
@@ -19,7 +22,7 @@ function ndcToScreen(p, width, height) {
 }
 
 function main() {
-    var frameBuffer = new FrameBuffer(width, height, new Color(1, 1, 1, 1));
+    var frameBuffer = new FrameBuffer(imgData, width, height, new Color(1, 1, 1, 1));
     
     // fill triangle by triangle three points
     var v0 = ndcToScreen(vert[0], width, height);
@@ -33,7 +36,7 @@ function main() {
     }
     
 
-    array_to_frame(frameBuffer)
+    array_to_frame(ctx, frameBuffer)
 }
 
 main();

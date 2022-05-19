@@ -10,20 +10,25 @@ class Color {
 }
 
 class FrameBuffer {
-    constructor(width, height, clearColor = new Color(1, 1, 1, 1)) {
+    constructor(imgData, width, height, clearColor = new Color(1, 1, 1, 1)) {
         this.width = width;
         this.height = height;
-        this.bufferArray = [];
-        this.bufferArray.length = width * height;
+        this.imgData = imgData;
         for (let x = 0; x < width; x++) {
             for (let y = 0; y < height; y++) {
-                this.bufferArray[y * width + x] = clearColor;
+                this.imgData.data[(x + y * width ) * 4]   =   Math.round(clearColor.r * 255);
+                this.imgData.data[(x + y * width ) * 4 + 1] = Math.round(clearColor.g * 255);
+                this.imgData.data[(x + y * width ) * 4 + 2] = Math.round(clearColor.b * 255);
+                this.imgData.data[(x + y * width ) * 4 + 3] = Math.round(clearColor.a * 255);
             }
             
         }
     }
     changePosValue(x, y, color) {
-        this.bufferArray[y * width + x] = color;
+        this.imgData.data[(x + y * this.width)*4]   = Math.round(color.r * 255);
+        this.imgData.data[(x + y * this.width)*4+1] = Math.round(color.g * 255);
+        this.imgData.data[(x + y * this.width)*4+2] = Math.round(color.b * 255);
+        this.imgData.data[(x + y * this.width)*4+3] = Math.round(color.a * 255);
     }
 }
 
@@ -42,20 +47,7 @@ function colorRGB2Hex(color) {
     return hex;
 }
 
-// array to image
-var canvas = document.querySelector('#mycanvas');
-var ctx = canvas.getContext("2d");
-
 // array is color buffer
-function array_to_frame(frameBuffer) {
-    var width = frameBuffer.width;
-    var height = frameBuffer.height;
-
-    for (let x = 0; x < width; x++) {
-        for (let y = 0; y < height; y++) {
-            let color = frameBuffer.bufferArray[y * width + x];
-            ctx.fillStyle = colorRGB2Hex(color);
-            ctx.fillRect(x, y, 1, 1);
-        }
-    }
+function array_to_frame(ctx, frameBuffer) {
+    ctx.putImageData(frameBuffer.imgData, 0, 0);
 }
