@@ -7,17 +7,17 @@ function IsPointInTriangle4(a, b, c, p){
     var PA = minus(a, p);
     var PB = minus(b, p);
     var PC = minus(c, p);
-    let t1 = dot_product(PA, PB);
-    let t2 = dot_product(PB, PC);
-    let t3 = dot_product(PC, PA);
+    let t1 = coross_product(PA, PB);
+    let t2 = coross_product(PB, PC);
+    let t3 = coross_product(PC, PA);
     return t1*t2 >= 0 && t1*t3 >= 0;
 }
 
 function IsPointAtSameSideOfLine(m, n, a, b) {
-    let AB = minus(b,a);
+    let AB = minus(b, a);
     let AM = minus(m, a);
     let AN = minus(n, a);
-    return dot_product(AB, AM) * dot_product(AB, AN) >= 0;
+    return coross_product(AB, AM) * coross_product(AB, AN) >= 0;
 }
 
 function IsPointInTriangle2(a, b, c, p){
@@ -45,10 +45,11 @@ function fillTriangle(v0, v1, v2) {
 
             // if any point in the left of line, point is outside of triangle
             // if (cross(v1, v2, p) < 0 || cross(v2, v0, p) < 0 || cross(v0, v1, p) < 0) {
-            // if (!IsPointInTriangle4(v0, v1, v2, p)) {
-            if (!IsPointInTriangle2(v0, v1, v2, p)) {
+            // if (!IsPointInTriangle2(v0, v1, v2, p)) {
+            if (!IsPointInTriangle4(v0, v1, v2, p)) {
                 continue; 
             }
+            // console.log(x,y)
             output.push(vec2(x, y));
         }
     }
