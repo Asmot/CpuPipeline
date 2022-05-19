@@ -1,3 +1,4 @@
+// https://codepen.io/GabbeV/pen/abOVjQ
 
 class Color {
     constructor(r,g,b,a) {
@@ -20,6 +21,9 @@ class FrameBuffer {
             }
             
         }
+    }
+    changePosValue(x, y, color) {
+        this.bufferArray[y * width + x] = color;
     }
 }
 
@@ -45,7 +49,7 @@ var ctx = canvas.getContext("2d");
 // array is color buffer
 function array_to_frame(frameBuffer) {
     var width = frameBuffer.width;
-    var height = frameBuffer.width;
+    var height = frameBuffer.height;
 
     for (let x = 0; x < width; x++) {
         for (let y = 0; y < height; y++) {
