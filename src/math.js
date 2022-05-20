@@ -11,6 +11,15 @@ function vec2(x_value, y_value) {
     return {x: x_value, y: y_value}
 }
 
+function vec3(x_value, y_value, z_value) {
+    return {x: x_value, y: y_value, z: z_value};
+}
+
+function vec4(x_value, y_value, z_value, w_value) {
+    return {x: x_value, y: y_value, z: z_value, w: w_value};
+}
+
+
 function minus(a, b) {
     return vec2(a.x - b.x, a.y - b.y);
 }
