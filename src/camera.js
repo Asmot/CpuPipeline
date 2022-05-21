@@ -1,3 +1,5 @@
+// https://glmatrix.net/docs/module-mat4.html
+
 class Camera {
     constructor(width, height) {
         this.viewMatrix = mat4.create();
@@ -30,9 +32,9 @@ class Camera {
         mat4.rotateX(this.cameraModelMat, this.cameraModelMat, this.pitch);
         mat4.translate(this.cameraModelMat, this.cameraModelMat, [0, 0, cameraToCenterDistance]);
     
-        mat4.invert(this.viewMat, this.cameraModelMat);
+        mat4.invert(this.viewMatrix, this.cameraModelMat);
 
-        mat4.perspective(this.projMat, this.fovR, this.aspect, this.near, this.far);
+        mat4.perspective(this.projectionMatrix, this.fovR, this.aspect, this.near, this.far);
 
     }
     

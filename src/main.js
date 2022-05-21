@@ -17,21 +17,30 @@ const indeices = [0, 1, 2, 0, 2, 3];
 const color = new Color(1,0,0,1);
 
 var camera = new Camera(width, height);
+camera.update();
 
 
 // ndc -1 1
 function ndcToScreen(p, width, height) {
-    return vec2(
-        (((p.x + 1) / 2.0 ) * width),
-        (((-p.y + 1) / 2.0 ) * height)
+    return vec2.fromValues(
+        (((p[0] + 1) / 2.0 ) * width),
+        (((-p[1] + 1) / 2.0 ) * height)
     );
 }
 
 function main() {
     var frameBuffer = new FrameBuffer(imgData, width, height, new Color(1, 1, 1, 1));
+
+    let uniforms = {
+        viewMatrix : camera.getViewMatrix(),
+        projectionMatrix : camera.getProjectionMatrix()
+    }
     
-    // primitive setup
+    // step 1 primitive setup
     let triangles = primitiveSetup(vert, vertStride, FieldTypeVec3, indeices, PrimitiveTypeTriangles)
+
+    // step 2 culling and clipping
+    // triangles = culling(triangles, uniforms)
 
     triangles.forEach(triangle => {
         // fill triangle by triangle three points
@@ -42,7 +51,7 @@ function main() {
         let trianglePoints = fillTriangle(v0, v1, v2);
         for (let i = 0; i < trianglePoints.length; i ++) {
             let p = trianglePoints[i];
-            frameBuffer.changePosValue(p.x, p.y, color)
+            frameBuffer.changePosValue(p[0], p[1], color)
         }
     });
    

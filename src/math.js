@@ -1,35 +1,17 @@
 // vector and matrix
 
-class Vector2 {
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-}
-
-function vec2(x_value, y_value) {
-    return {x: x_value, y: y_value}
-}
-
-function vec3(x_value, y_value, z_value) {
-    return {x: x_value, y: y_value, z: z_value};
-}
-
-function vec4(x_value, y_value, z_value, w_value) {
-    return {x: x_value, y: y_value, z: z_value, w: w_value};
-}
-
+// const { vec2 } = require("gl-matrix");
 
 function minus(a, b) {
-    return vec2(a.x - b.x, a.y - b.y);
+    return vec2.fromValues(a[0] - b[0], a[1] - b[1]);
 }
 
 // V1(x1, y1) X V2(x2, y2) = x1y2 – y1x2
 function coross_product(a, b) {
-    return a.x * b.y - a.y * b.x;
+    return a[0] * b[1] - a[1] * b[0];
 }
 
 //V1( x1, y1)   V2(x2, y2) = x1*x2 + y1*y2
 function dot_product(a, b) {
-    return a.x * b.x + a.y * b.y;
+    return a[0] * b[0] + a[1] * b[1];
 }
