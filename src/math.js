@@ -18,8 +18,8 @@ function dot_product(a, b) {
 
 function transformMat4Triangle(p, mvpMat) {
     const output = vec4.create();
-    const input = vec4.fromValues(p[0], p[1], p[2], p[3]);
-    vec4.transformMat4(output, input, mvpMat);
+    // const input = vec4.fromValues(p[0], p[1], p[2], p[3]);
+    vec4.transformMat4(output, p, mvpMat);
     vec4.scale(output, output, 1 / output[3]);
     return output;
 }
@@ -31,6 +31,32 @@ function degreeToRadian(degree){
     return degree * RADIANS_PER_DEGREE;
 }
 
+function normalize(vec4Value) {
+    return vec4.fromValues(
+        vec4Value[0]/ vec4Value[3],
+        vec4Value[1]/ vec4Value[3],
+        vec4Value[2]/ vec4Value[3],
+        1
+    );
+}
+
+// ndc -1 1
+function ndcToScreen(ndcP, width, height) {
+    let p = normalize(ndcP);
+    return vec4.fromValues(
+        Math.floor((((p[0] + 1) / 2.0 ) * width) + 0.5),
+        Math.floor((((-p[1] + 1) / 2.0 ) * height) + 0.5),
+        p[2],
+        p[3]
+    );
+}
+
+function screenToNdc(x, y, width, height) {
+    return vec2.fromValues(
+        (2 * x - width) / width,
+        - (2 * y - height) / height
+    );
+}
 
 const PrimitiveTypeTriangles = 0
 const FieldTypeVec3 = 0

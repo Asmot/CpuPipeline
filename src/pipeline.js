@@ -1,12 +1,3 @@
-// ndc -1 1
-function ndcToScreen(p, width, height) {
-    return vec4.fromValues(
-        Math.floor((((p[0] + 1) / 2.0 ) * width) + 0.5),
-        Math.floor((((-p[1] + 1) / 2.0 ) * height) + 0.5),
-        p[2],
-        p[3]
-    );
-}
 
 /**
  * change framebuffer by meshdata and uniforms
@@ -29,7 +20,7 @@ function draw(frameBuffer, meshData, uniforms) {
     let triangles_interpolating = rasterizer_processing(triangles, width, height);
     console.log("triangles_interpolating point size " + triangles_interpolating.length);
     // culling 3.1
-    culling(triangles_interpolating);
+    // culling(triangles_interpolating);
     console.log("triangles_interpolating culling point size " + triangles_interpolating.length);
 
     // step 4 shading
