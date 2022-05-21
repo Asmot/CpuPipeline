@@ -10,7 +10,7 @@ const meshData = testData_alix();
 // const meshData = testData0();
 
 var camera = new Camera(width, height);
-camera.position(0, 0, -10);
+camera.position(0, 0, 100);
 camera.update();
 
 
@@ -22,11 +22,12 @@ function main() {
         projectionMatrix : camera.getProjectionMatrix()
     }
     
-    draw(frameBuffer, testData_alix(), uniforms)
+    // draw(frameBuffer, testData_alix(), uniforms)
     draw(frameBuffer, testData_zbuffer(), uniforms)
     // draw(frameBuffer, testData0(), uniforms)
 
     array_to_frame(ctx, frameBuffer)
+    // draw_depth_buffer(ctx, frameBuffer)
 }
 
 main();

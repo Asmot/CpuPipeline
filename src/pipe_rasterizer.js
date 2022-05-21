@@ -100,6 +100,14 @@ function fillTriangle(triangle, width, height) {
 
     for (var y = minY; y < maxY; y += y_step) {
         for (var x = minX; x < maxX; x += x_step) {
+            // culling outof space
+            if( x > 1 ||
+                x < -1 ||
+                y > 1 ||
+                y < -1) {
+                continue;
+            }
+
             p[0] = x + 0.5 * x_step; 
             p[1] = y + 0.5 * y_step;
 
@@ -116,14 +124,6 @@ function fillTriangle(triangle, width, height) {
             // let w = interpolate(v0.w, v1.w, v2.w, abc);
             let w = 1;
             var position = vec4.fromValues(x, y, z, w)
-
-                        // culling outof space
-                        if(!((position[0] <= 1 && position[0] >= -1) &&
-                        (position[1] <= 1 && position[1] >= -1))) {
-                        continue;
-                    }
-        
-        
 
             var varyingsValues = {};
             for (const key in triangle.v0.varyings) {

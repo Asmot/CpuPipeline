@@ -23,7 +23,7 @@ class FrameBuffer {
                 this.imgData.data[(x + y * width ) * 4 + 3] = Math.round(clearColor[3] * 255);
             }   
         }
-        this.clearDepthBuffer(1.0);
+        this.clearDepthBuffer(1);
     }
     changePosValue(x, y, color) {
         this.imgData.data[(x + y * this.width)*4]   = Math.round(color[0] * 255);
@@ -40,11 +40,11 @@ class FrameBuffer {
             }
         }
     }
-    changeDepthValue(x, y, value) {
-        this.depthBuffer[(x + y * width )] = value
+    setDepthValue(x, y, value) {
+        this.depthBuffer[(x + y * this.width )] = value
     }
     getDepthValue(x, y) {
-        return   this.depthBuffer[(x + y * width )];
+        return   this.depthBuffer[(x + y * this.width )];
     }
 }
 
@@ -54,10 +54,10 @@ const rgbaToHex = (r, g, b, a) => '#' + [r, g, b, a].map(x => {
 }).join('')
 
 function colorRGB2Hex(color) {
-    let r = color.r * 255;
-    let g = color.g * 255;
-    let b = color.b * 255;
-    let a = color.a * 255;
+    let r = Math.floor(color[0] * 255);
+    let g = Math.floor(color[1] * 255);
+    let b = Math.floor(color[2] * 255);
+    let a = Math.floor(color[3] * 255);
 
     let hex = rgbaToHex(r, g, b, a);
     return hex;
@@ -66,4 +66,20 @@ function colorRGB2Hex(color) {
 // array is color buffer
 function array_to_frame(ctx, frameBuffer) {
     ctx.putImageData(frameBuffer.imgData, 0, 0);
+}
+
+function draw_depth_buffer(ctx, frameBuffer) {
+    var width = frameBuffer.width;
+    var height = frameBuffer.height;
+    for (let x = 0; x < width; x++) {
+        for (let y = 0; y < height; y++) {
+            var depth = frameBuffer.getDepthValue(x, y)
+            if (depth !== 1) {
+                ctx.fillStyle = colorRGB2Hex(new Color(depth, 0, 0, 1));    
+            } else {
+                ctx.fillStyle = "#000000"
+            }
+            ctx.fillRect(x, y, 1, 1);
+        }
+    }
 }

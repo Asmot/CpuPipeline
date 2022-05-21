@@ -13,7 +13,7 @@ class Camera {
         this.pitch = 0;
         this.width = width;
         this.height = height;
-        this.fovR = 60;
+        this.fovR = degreeToRadian(60);
         this.aspect = height / width;
         this.near = 0.1;
         this.far = 1000;
@@ -31,8 +31,10 @@ class Camera {
         mat4.rotateZ(this.cameraModelMat, this.cameraModelMat, -this.rotate);
         mat4.rotateX(this.cameraModelMat, this.cameraModelMat, this.pitch);
         mat4.translate(this.cameraModelMat, this.cameraModelMat, [0, 0, cameraToCenterDistance]);
-    
         mat4.invert(this.viewMatrix, this.cameraModelMat);
+
+        // mat4.identity(this.viewMatrix);
+        // mat4.lookAt(this.viewMatrix, this.pos, [0,0,0], [0,1,0]);
 
         mat4.perspective(this.projectionMatrix, this.fovR, this.aspect, this.near, this.far);
 

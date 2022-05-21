@@ -27,15 +27,18 @@ function draw(frameBuffer, meshData, uniforms) {
 
     // step 3.0  rasterizer
     let triangles_interpolating = rasterizer_processing(triangles, width, height);
-
+    console.log("triangles_interpolating point size " + triangles_interpolating.length);
     // culling 3.1
     culling(triangles_interpolating);
+    console.log("triangles_interpolating culling point size " + triangles_interpolating.length);
 
     // step 4 shading
     let colorWithBuffers = pixel_shadding(triangles_interpolating, width, height);
+    console.log("colorWithBuffers point size " + colorWithBuffers.length);
 
     // step 4.1 depth-test
-    // depthtest(colorWithBuffers, frameBuffer);
+    colorWithBuffers = depthtest(colorWithBuffers, frameBuffer);
+    console.log("colorWithBuffers point depthtest size " + colorWithBuffers.length);
 
     // step 5 to frame
     colorWithBuffers.forEach(item => {

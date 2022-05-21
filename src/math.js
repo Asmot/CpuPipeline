@@ -24,6 +24,13 @@ function transformMat4Triangle(p, mvpMat) {
     return output;
 }
 
+const DEGREES_PER_RADIAN = 180 / Math.PI; // 57.29577951308232
+const RADIANS_PER_DEGREE = Math.PI / 180; // 0.017453292519943295;
+
+function degreeToRadian(degree){
+    return degree * RADIANS_PER_DEGREE;
+}
+
 
 const PrimitiveTypeTriangles = 0
 const FieldTypeVec3 = 0

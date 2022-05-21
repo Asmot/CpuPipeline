@@ -33,7 +33,7 @@ function vert_main(attrItemArray, uniforms) {
     let mvpMat = mat4.create();
     mat4.multiply(mvpMat, uniforms.projectionMatrix, uniforms.viewMatrix);
     let position = transformMat4Triangle(aVert, mvpMat)
-
+    console.log("vert_main " + aVert +  " => " + position);
     return {gl_Position : position, varyings : {color: aColor}};
 }
 
