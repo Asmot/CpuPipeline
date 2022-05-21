@@ -1,10 +1,10 @@
 
-
 function transformMat4Triangle(p, mvpMat) {
     const output = vec4.create();
     const input = vec4.fromValues(p[0], p[1], p[2], p[3]);
-    vec4.transformMat4(output, input, this.mvpMat);
-    return vec4.fromValues(output[0], output[1], output[2], output[3]);
+    vec4.transformMat4(output, input, mvpMat);
+    vec4.scale(output, output, 1 / output[3]);
+    return output;
     
 }
 

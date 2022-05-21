@@ -7,10 +7,10 @@ data = imgData.data;
 
 
 const vert = [
-    -1, -1, 0,
-    0, 1, 0,
-    1, 1, 0,
-    1, 0, 0
+    -100, -100, 0,
+     0,    100, 0,
+     100,  100, 0,
+     100,  0,   0
 ];
 const vertStride = 3;
 const indeices = [0, 1, 2, 0, 2, 3];
@@ -40,7 +40,7 @@ function main() {
     let triangles = primitiveSetup(vert, vertStride, FieldTypeVec3, indeices, PrimitiveTypeTriangles)
 
     // step 2 culling and clipping
-    // triangles = culling(triangles, uniforms)
+    triangles = culling(triangles, uniforms)
 
     triangles.forEach(triangle => {
         // fill triangle by triangle three points

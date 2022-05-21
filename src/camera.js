@@ -8,7 +8,7 @@ class Camera {
         mat4.identity(this.viewMatrix);
         mat4.identity(this.projectionMatrix);
 
-        this.pos =[-100, 0, 0];
+        this.pos =[0, 0, -50];
         this.rotate = 0;
         this.pitch = 0;
         this.width = width;
