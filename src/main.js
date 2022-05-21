@@ -43,40 +43,23 @@ function main() {
     // step 1.0 vertex_processing
     let points_processing = vert_processing(vert, vertStride, uniforms);
 
-    // step 1.1  triangle_processing
+    // step 2.0  triangle_processing
     let triangles = triangle_processing(points_processing,indeices, PrimitiveTypeTriangles);
     
-    // step 2.0  rasterizer
+    // step 3.0  rasterizer
     let triangles_interpolating = rasterizer_processing(triangles, width, height);
 
-    // step 1 primitive setup
-    // let triangles = primitiveSetup(points_processing, FieldTypeVec3, indeices, PrimitiveTypeTriangles)
+    // culling 3.1
+    let triangles_culling = culling(triangles_interpolating);
 
-    // // step 2 culling and clipping
-    // triangles = culling(triangles, uniforms)
-
-    // 
-    triangles_interpolating.forEach(point => {
+    triangles_culling.forEach(point => {
+        // step 4 shading
         var color = frag_main(point);
 
         var p = point.gl_Position;
         var v = ndcToScreen(p, width, height);
         frameBuffer.changePosValue(v[0], v[1], color)
     });
-    // triangles.forEach(triangle => {
-    //     // fill triangle by triangle three points
-    //     var v0 = ndcToScreen(triangle.v0, width, height);
-    //     var v1 = ndcToScreen(triangle.v1, width, height);
-    //     var v2 = ndcToScreen(triangle.v2, width, height);
-
-    //     let trianglePoints = fillTriangle(v0, v1, v2);
-    //     for (let i = 0; i < trianglePoints.length; i ++) {
-    //         let p = trianglePoints[i];
-    //         frameBuffer.changePosValue(p[0], p[1], color)
-    //     }
-    // });
-   
-    
 
     array_to_frame(ctx, frameBuffer)
 }

@@ -116,6 +116,12 @@ function fillTriangle(triangle, width, height) {
             let w = 1;
             var position = vec4.fromValues(x, y, z, w)
 
+            // culling outof space
+            if(!((position[0] <= 1 && position[0] >= -1) &&
+                (position[1] <= 1 && position[1] >= -1))) {
+                continue;
+            }
+
             var varyingsValues = {};
             for (const key in triangle.v0.varyings) {
                 const varyingValue0 = triangle.v0.varyings[key];
