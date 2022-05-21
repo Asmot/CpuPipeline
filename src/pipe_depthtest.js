@@ -9,6 +9,7 @@ function depthtest(colorWithBuffers, frameBuffer) {
         let bufferDepth = frameBuffer.getDepthValue(item.s_x, item.s_y);
         if (item.depth > bufferDepth) {
             colorWithBuffers.splice(index, 1);
+            index--;
         } else {
             frameBuffer.setDepthValue(item.s_x, item.s_y, item.depth)
         }
