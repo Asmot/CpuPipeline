@@ -74,6 +74,7 @@ function normalize(vec4Value) {
     );
 }
 
+
 // find the all point form triangle three point
 // y toward down
 // return an array
@@ -111,16 +112,18 @@ function fillTriangle(triangle, width, height) {
             
             var abc = computeBarycentric2D(x, y, v0, v1, v2);
 
-            let z = interpolate(v0[3], v1[3], v2[3], abc);
+            let z = interpolate(v0[2], v1[2], v2[2], abc);
             // let w = interpolate(v0.w, v1.w, v2.w, abc);
             let w = 1;
             var position = vec4.fromValues(x, y, z, w)
 
-            // culling outof space
-            if(!((position[0] <= 1 && position[0] >= -1) &&
-                (position[1] <= 1 && position[1] >= -1))) {
-                continue;
-            }
+                        // culling outof space
+                        if(!((position[0] <= 1 && position[0] >= -1) &&
+                        (position[1] <= 1 && position[1] >= -1))) {
+                        continue;
+                    }
+        
+        
 
             var varyingsValues = {};
             for (const key in triangle.v0.varyings) {

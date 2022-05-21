@@ -24,6 +24,7 @@ function main() {
     
     draw(frameBuffer, testData_alix(), uniforms)
     draw(frameBuffer, testData_zbuffer(), uniforms)
+    // draw(frameBuffer, testData0(), uniforms)
 
     array_to_frame(ctx, frameBuffer)
 }

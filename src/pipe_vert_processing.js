@@ -61,7 +61,3 @@ function vert_processing(attributeData, attributeStride, uniforms) {
     return result;
    
 }
-
-function primitiveSetup(attributeData, attributeStride, attributeType, indexData, type){
-  
-}

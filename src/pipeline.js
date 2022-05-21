@@ -29,15 +29,17 @@ function draw(frameBuffer, meshData, uniforms) {
     let triangles_interpolating = rasterizer_processing(triangles, width, height);
 
     // culling 3.1
-    let triangles_culling = culling(triangles_interpolating);
+    culling(triangles_interpolating);
 
-    triangles_culling.forEach(point => {
-        // step 4 shading
-        var color = frag_main(point);
+    // step 4 shading
+    let colorWithBuffers = pixel_shadding(triangles_interpolating, width, height);
 
-        var p = point.gl_Position;
-        var v = ndcToScreen(p, width, height);
-        frameBuffer.changePosValue(v[0], v[1], color)
+    // step 4.1 depth-test
+    // depthtest(colorWithBuffers, frameBuffer);
+
+    // step 5 to frame
+    colorWithBuffers.forEach(item => {
+        frameBuffer.changePosValue(item.s_x, item.s_y, item.color)
     });
 
 }

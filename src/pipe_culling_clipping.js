@@ -13,7 +13,4 @@ function culling(triangles) {
             triangles.splice(point)
         }
     });
-
-    return triangles;
-
 }

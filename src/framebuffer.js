@@ -43,6 +43,9 @@ class FrameBuffer {
     changeDepthValue(x, y, value) {
         this.depthBuffer[(x + y * width )] = value
     }
+    getDepthValue(x, y) {
+        return   this.depthBuffer[(x + y * width )];
+    }
 }
 
 const rgbaToHex = (r, g, b, a) => '#' + [r, g, b, a].map(x => {
