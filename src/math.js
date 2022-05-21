@@ -15,3 +15,15 @@ function coross_product(a, b) {
 function dot_product(a, b) {
     return a[0] * b[0] + a[1] * b[1];
 }
+
+function transformMat4Triangle(p, mvpMat) {
+    const output = vec4.create();
+    const input = vec4.fromValues(p[0], p[1], p[2], p[3]);
+    vec4.transformMat4(output, input, mvpMat);
+    vec4.scale(output, output, 1 / output[3]);
+    return output;
+}
+
+
+const PrimitiveTypeTriangles = 0
+const FieldTypeVec3 = 0

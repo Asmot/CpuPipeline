@@ -13,8 +13,9 @@ const vert = [
      100,  0,   0
 ];
 const vertStride = 3;
-const indeices = [0, 1, 2, 0, 2, 3];
+const indeices = [0, 1, 3, 0, 2, 3];
 const color = new Color(1,0,0,1);
+const color1 = new Color(1,0,0,1);
 
 var camera = new Camera(width, height);
 camera.update();
@@ -36,11 +37,17 @@ function main() {
         projectionMatrix : camera.getProjectionMatrix()
     }
     
-    // step 1 primitive setup
-    let triangles = primitiveSetup(vert, vertStride, FieldTypeVec3, indeices, PrimitiveTypeTriangles)
+    // step 0 vertex_processing
+    let points_processing = vert_processing(vert, vertStride, uniforms);
 
-    // step 2 culling and clipping
-    triangles = culling(triangles, uniforms)
+    // step 1  triangle_processing
+    let triangles = triangle_processing(points_processing,indeices, PrimitiveTypeTriangles);
+    
+    // step 1 primitive setup
+    // let triangles = primitiveSetup(points_processing, FieldTypeVec3, indeices, PrimitiveTypeTriangles)
+
+    // // step 2 culling and clipping
+    // triangles = culling(triangles, uniforms)
 
     triangles.forEach(triangle => {
         // fill triangle by triangle three points
