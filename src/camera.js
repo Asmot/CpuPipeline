@@ -33,8 +33,15 @@ class Camera {
         mat4.translate(this.cameraModelMat, this.cameraModelMat, [0, 0, cameraToCenterDistance]);
         mat4.invert(this.viewMatrix, this.cameraModelMat);
 
+        console.log("[camera] pos " + this.pos + " fov " + this.fovR)
+        console.log("[camera] cameraToCenterDistance " + cameraToCenterDistance)
+
+        console.log("[camera] viewMatrix " + this.viewMatrix + " fov " + this.fovR)
+
         // mat4.identity(this.viewMatrix);
         // mat4.lookAt(this.viewMatrix, this.pos, [0,0,0], [0,1,0]);
+        // console.log("[camera] viewMatrix " + this.viewMatrix + " fov " + this.fovR)
+       
 
         mat4.perspective(this.projectionMatrix, this.fovR, this.aspect, this.near, this.far);
 

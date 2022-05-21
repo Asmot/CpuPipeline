@@ -66,6 +66,21 @@ function colorRGB2Hex(color) {
 // array is color buffer
 function array_to_frame(ctx, frameBuffer) {
     ctx.putImageData(frameBuffer.imgData, 0, 0);
+    // var width = frameBuffer.width;
+    // var height = frameBuffer.height;
+    // for (let x = 0; x < width; x++) {
+    //     for (let y = 0; y < height; y++) {
+          
+    //         let r = frameBuffer.imgData.data[(x + y * width ) * 4] / 255;
+    //         let g = frameBuffer.imgData.data[(x + y * width ) * 4 + 1] / 255;
+    //         let b = frameBuffer.imgData.data[(x + y * width ) * 4 + 2] / 255;
+    //         let a = frameBuffer.imgData.data[(x + y * width ) * 4 + 3] / 255;
+
+    //         ctx.fillStyle = colorRGB2Hex(new Color(r, g, b, a));    
+            
+    //         ctx.fillRect(x, y, 1, 1);
+    //     }
+    // }
 }
 
 function draw_depth_buffer(ctx, frameBuffer) {
