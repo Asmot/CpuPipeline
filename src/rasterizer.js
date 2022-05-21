@@ -27,21 +27,70 @@ function IsPointInTriangle2(a, b, c, p){
 }
 
 
+// function screenToNdc(p, width, height) {
+//     return vec4.fromValues(
+//         (((p[0] + 1) / 2.0 ) * width),
+//         (((-p[1] + 1) / 2.0 ) * height),
+//         p[2],
+//         p[3]
+//     );
+// }
+
+// (x,y) = α * A + β* B + γ * C
+// ABC is the area of triangle
+// reutrn [α ,β, γ]
+function computeBarycentric2D(x, y, v0, v1, v2){
+    var c1 = (x*(v1[1] - v2[1]) + (v2[0] - v1[0])*y + v1[0]*v2[1] - v2[0]*v1[1]) / (v0[0]*(v1[1] - v2[1]) + (v2[0] - v1[0])*v0[1] + v1[0]*v2[1] - v2[0]*v1[1]);
+    var c2 = (x*(v2[1] - v0[1]) + (v0[0] - v2[0])*y + v2[0]*v0[1] - v0[0]*v2[1]) / (v1[0]*(v2[1] - v0[1]) + (v0[0] - v2[0])*v1[1] + v2[0]*v0[1] - v0[0]*v2[1]);
+    var c3 = (x*(v0[1] - v1[1]) + (v1[0] - v0[0])*y + v0[0]*v1[1] - v1[0]*v0[1]) / (v2[0]*(v0[1] - v1[1]) + (v1[0] - v0[0])*v2[1] + v0[0]*v1[1] - v1[0]*v0[1]);
+    return [c1, c2, c3];
+}
+
+// (x,y) = α * A + β* B + γ * C
+function interpolate(value0, value1, value2,  abc) {
+    let alpha = abc[0];
+    let beta = abc[1];
+    let gamma = abc[2];
+    
+    return alpha / value0 + beta / value1 + gamma / value2;
+}
+
+function normalize(vec4Value) {
+    return vec4.fromValues(
+        vec4Value[0]/ vec4Value[3],
+        vec4Value[1]/ vec4Value[3],
+        vec4Value[2]/ vec4Value[3],
+        1
+    );
+}
+
 // find the all point form triangle three point
 // y toward down
 // return an array
-function fillTriangle(v0, v1, v2) {
-    var minX = Math.floor(Math.min(v0[0], v1[0], v2[0]));
-    var maxX = Math.ceil(Math.max(v0[0], v1[0], v2[0]));
-    var minY = Math.floor(Math.min(v0[1], v1[1], v2[1]));
-    var maxY = Math.ceil(Math.max(v0[1], v1[1], v2[1]));
+function fillTriangle(triangle, width, height) {
+    
+    var v0 = triangle.v0.gl_Position;
+    var v1 = triangle.v1.gl_Position;
+    var v2 = triangle.v2.gl_Position
+
+    v0 = normalize(v0);
+    v1 = normalize(v1);
+    v2 = normalize(v2);
+ 
+    var minX = Math.min(v0[0], v1[0], v2[0]);
+    var maxX = Math.max(v0[0], v1[0], v2[0]);
+    var minY = Math.min(v0[1], v1[1], v2[1]);
+    var maxY = Math.max(v0[1], v1[1], v2[1]);
     var output = new Array();
     var p = {};  
     
-    for (var y = minY; y < maxY; y++) {
-        for (var x = minX; x < maxX; x++) {
-            p[0] = x + 0.5; 
-            p[1] = y + 0.5;
+    var x_step = 1 / width;
+    var y_step = 1 / height;
+
+    for (var y = minY; y < maxY; y += y_step) {
+        for (var x = minX; x < maxX; x += x_step) {
+            p[0] = x + 0.5 * x_step; 
+            p[1] = y + 0.5 * y_step;
 
             // if any point in the left of line, point is outside of triangle
             // if (cross(v1, v2, p) < 0 || cross(v2, v0, p) < 0 || cross(v0, v1, p) < 0) {
@@ -49,9 +98,39 @@ function fillTriangle(v0, v1, v2) {
             if (!IsPointInTriangle4(v0, v1, v2, p)) {
                 continue; 
             }
-            // console.log(x,y)
-            output.push(vec2.fromValues(x, y));
+            
+            var abc = computeBarycentric2D(x, y, v0, v1, v2);
+
+            let z = interpolate(v0[3], v1[3], v2[3], abc);
+            // let w = interpolate(v0.w, v1.w, v2.w, abc);
+            let w = 1;
+            var position = vec4.fromValues(x, y, z, w)
+
+            output.push({
+                gl_Position : position,
+                varyings : {}
+            });
         }
     }
     return output;
+}
+
+/**
+ * fill the triangles inner point
+ * interpolate all value in triangle
+ * @param {*} triangles 
+ * @param {*} width 
+ * @param {*} height 
+ */
+function rasterizer_processing(triangles, width, height) {
+    triangles_interpolating = []
+    counter = 0;
+    triangles.forEach(triangle => {
+        // fill triangle by triangle three points
+        let trianglePoints = fillTriangle(triangle, width, height);
+        trianglePoints.forEach(item =>{
+            triangles_interpolating[counter++] = item;
+        });
+    });
+    return triangles_interpolating;
 }

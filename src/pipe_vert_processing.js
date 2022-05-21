@@ -12,10 +12,10 @@ function getVec3(attributeData, attributeStride, index) {
 
 
 /**
- * shader vert main, return gl_position
+ * shader vert main, return gl_Position
  * @param {*} attrItem each attribuet array 
  * @param {*} uniforms 
- * @returns 
+ * @returns {gl_Position : vec4, varyings : {}}
  */
 function vert_main(attrItemArray, uniforms) {
     const aVert = vec4.fromValues(
@@ -26,8 +26,9 @@ function vert_main(attrItemArray, uniforms) {
     );
     let mvpMat = mat4.create();
     mat4.multiply(mvpMat, uniforms.projectionMatrix, uniforms.viewMatrix);
-    let gl_position = transformMat4Triangle(aVert, mvpMat)
-    return gl_position;
+    let position = transformMat4Triangle(aVert, mvpMat)
+
+    return {gl_Position : position, varyings : {}};
 }
 
 

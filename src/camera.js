@@ -37,6 +37,10 @@ class Camera {
         mat4.perspective(this.projectionMatrix, this.fovR, this.aspect, this.near, this.far);
 
     }
+    position(x,y,z) {
+        this.pos = vec3.fromValues(x, y, z);
+        this.update()
+    }
     
     getViewMatrix() {
         return this.viewMatrix;
