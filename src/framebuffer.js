@@ -14,21 +14,34 @@ class FrameBuffer {
         this.width = width;
         this.height = height;
         this.imgData = imgData;
+        this.depthBuffer = []
         for (let x = 0; x < width; x++) {
             for (let y = 0; y < height; y++) {
                 this.imgData.data[(x + y * width ) * 4]   =   Math.round(clearColor[0] * 255);
                 this.imgData.data[(x + y * width ) * 4 + 1] = Math.round(clearColor[1] * 255);
                 this.imgData.data[(x + y * width ) * 4 + 2] = Math.round(clearColor[2] * 255);
                 this.imgData.data[(x + y * width ) * 4 + 3] = Math.round(clearColor[3] * 255);
-            }
-            
+            }   
         }
+        this.clearDepthBuffer(1.0);
     }
     changePosValue(x, y, color) {
         this.imgData.data[(x + y * this.width)*4]   = Math.round(color[0] * 255);
         this.imgData.data[(x + y * this.width)*4+1] = Math.round(color[1] * 255);
         this.imgData.data[(x + y * this.width)*4+2] = Math.round(color[2] * 255);
         this.imgData.data[(x + y * this.width)*4+3] = Math.round(color[3] * 255);
+    }
+    clearDepthBuffer(value) {
+        var width = this.width;
+        var height = this.height;
+        for (let x = 0; x < width; x++) {
+            for (let y = 0; y < height; y++) {
+                this.depthBuffer[(x + y * width )] = value
+            }
+        }
+    }
+    changeDepthValue(x, y, value) {
+        this.depthBuffer[(x + y * width )] = value
     }
 }
 
