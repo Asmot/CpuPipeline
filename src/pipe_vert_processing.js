@@ -24,11 +24,17 @@ function vert_main(attrItemArray, uniforms) {
         attrItemArray[2],
         1
     );
+    const aColor = vec4.fromValues(
+        attrItemArray[3],
+        attrItemArray[4],
+        attrItemArray[5],
+        attrItemArray[6]
+    );
     let mvpMat = mat4.create();
     mat4.multiply(mvpMat, uniforms.projectionMatrix, uniforms.viewMatrix);
     let position = transformMat4Triangle(aVert, mvpMat)
 
-    return {gl_Position : position, varyings : {}};
+    return {gl_Position : position, varyings : {color: aColor}};
 }
 
 

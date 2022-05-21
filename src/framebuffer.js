@@ -2,10 +2,10 @@
 
 class Color {
     constructor(r,g,b,a) {
-        this.r = r;
-        this.g = g;
-        this.b = b;
-        this.a = a;
+        this[0] = r;
+        this[1] = g;
+        this[2] = b;
+        this[3] = a;
     }
 }
 
@@ -16,19 +16,19 @@ class FrameBuffer {
         this.imgData = imgData;
         for (let x = 0; x < width; x++) {
             for (let y = 0; y < height; y++) {
-                this.imgData.data[(x + y * width ) * 4]   =   Math.round(clearColor.r * 255);
-                this.imgData.data[(x + y * width ) * 4 + 1] = Math.round(clearColor.g * 255);
-                this.imgData.data[(x + y * width ) * 4 + 2] = Math.round(clearColor.b * 255);
-                this.imgData.data[(x + y * width ) * 4 + 3] = Math.round(clearColor.a * 255);
+                this.imgData.data[(x + y * width ) * 4]   =   Math.round(clearColor[0] * 255);
+                this.imgData.data[(x + y * width ) * 4 + 1] = Math.round(clearColor[1] * 255);
+                this.imgData.data[(x + y * width ) * 4 + 2] = Math.round(clearColor[2] * 255);
+                this.imgData.data[(x + y * width ) * 4 + 3] = Math.round(clearColor[3] * 255);
             }
             
         }
     }
     changePosValue(x, y, color) {
-        this.imgData.data[(x + y * this.width)*4]   = Math.round(color.r * 255);
-        this.imgData.data[(x + y * this.width)*4+1] = Math.round(color.g * 255);
-        this.imgData.data[(x + y * this.width)*4+2] = Math.round(color.b * 255);
-        this.imgData.data[(x + y * this.width)*4+3] = Math.round(color.a * 255);
+        this.imgData.data[(x + y * this.width)*4]   = Math.round(color[0] * 255);
+        this.imgData.data[(x + y * this.width)*4+1] = Math.round(color[1] * 255);
+        this.imgData.data[(x + y * this.width)*4+2] = Math.round(color[2] * 255);
+        this.imgData.data[(x + y * this.width)*4+3] = Math.round(color[3] * 255);
     }
 }
 

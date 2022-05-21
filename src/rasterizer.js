@@ -51,8 +51,18 @@ function interpolate(value0, value1, value2,  abc) {
     let alpha = abc[0];
     let beta = abc[1];
     let gamma = abc[2];
+    if (value0.constructor === Float32Array) {
+        var res = [];
+        for (let index = 0; index < value0.length; index++) {
+            const element0 = value0[index];
+            const element1 = value1[index];
+            const element2 = value2[index];
+            res[index] = alpha * element0 + beta * element1 + gamma * element2;
+        }
+        return res;
+    }
     
-    return alpha / value0 + beta / value1 + gamma / value2;
+    return alpha * value0 + beta * value1 + gamma * value2;
 }
 
 function normalize(vec4Value) {
@@ -106,9 +116,20 @@ function fillTriangle(triangle, width, height) {
             let w = 1;
             var position = vec4.fromValues(x, y, z, w)
 
+            var varyingsValues = {};
+            for (const key in triangle.v0.varyings) {
+                const varyingValue0 = triangle.v0.varyings[key];
+                const varyingValue1 = triangle.v1.varyings[key];
+                const varyingValue2 = triangle.v2.varyings[key];
+
+                const varyingValue = interpolate(varyingValue0, varyingValue1, varyingValue2, abc);
+            
+                varyingsValues[key] = varyingValue;
+            }
+
             output.push({
                 gl_Position : position,
-                varyings : {}
+                varyings : varyingsValues
             });
         }
     }
@@ -134,3 +155,4 @@ function rasterizer_processing(triangles, width, height) {
     });
     return triangles_interpolating;
 }
+

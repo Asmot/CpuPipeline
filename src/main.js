@@ -7,12 +7,12 @@ data = imgData.data;
 
 
 const vert = [
-    -100, -100, 0,
-     0,    100, 0,
-     500,  500, 0,
-     100,  0,   0
+    -100, -100, 0, 1, 0, 0, 1,
+     0,    100, 0, 0, 1, 0, 1,
+     500,  500, 0, 1, 1, 0, 1,
+     100,  0,   0, 0, 0, 1, 1,
 ];
-const vertStride = 3;
+const vertStride = 7;
 const indeices = [0, 1, 3, 0, 2, 3];
 const color = new Color(1,0,0,1);
 const color1 = new Color(1,0,0,1);
@@ -57,6 +57,8 @@ function main() {
 
     // 
     triangles_interpolating.forEach(point => {
+        var color = frag_main(point);
+
         var p = point.gl_Position;
         var v = ndcToScreen(p, width, height);
         frameBuffer.changePosValue(v[0], v[1], color)
