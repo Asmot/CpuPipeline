@@ -6,7 +6,8 @@ imgData = ctx.getImageData(0,0,width,height);
 data = imgData.data;
 
 
-const meshData = testData_zbuffer();
+const meshData = testData_alix();
+// const meshData = testData0();
 
 var camera = new Camera(width, height);
 camera.position(0, 0, -10);
@@ -20,7 +21,9 @@ function main() {
         viewMatrix : camera.getViewMatrix(),
         projectionMatrix : camera.getProjectionMatrix()
     }
-    draw(frameBuffer, meshData, uniforms)
+    
+    draw(frameBuffer, testData_alix(), uniforms)
+    draw(frameBuffer, testData_zbuffer(), uniforms)
 
     array_to_frame(ctx, frameBuffer)
 }
