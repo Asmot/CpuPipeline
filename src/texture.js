@@ -1,4 +1,10 @@
-
+function getPixelDataFromImage(image) {
+    var canvas = document.createElement('canvas');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    canvas.getContext('2d').drawImage(image, 0, 0, image.width, image.height);
+    return canvas.getContext('2d').getImageData(0, 0, image.width, image.height).data;
+}
 
 async function getPixelData(path) {
     const image = new Image()
@@ -6,11 +12,7 @@ async function getPixelData(path) {
     image.src = path
     return new Promise((resolve, reject) => {
         image.onload = function () {    
-            var canvas = document.createElement('canvas');
-            canvas.width = image.width;
-            canvas.height = image.height;
-            canvas.getContext('2d').drawImage(image, 0, 0, image.width, image.height);
-            let pixelData = canvas.getContext('2d').getImageData(0, 0, image.width, image.height).data;
+            var pixelData = getPixelDataFromImage(image)
             // console.log("[texture] onload " + image.width + " " + image.height)
             resolve([image.width, image.height, pixelData])
         }
@@ -19,9 +21,16 @@ async function getPixelData(path) {
 
 // load texture form file and have sample function
 class Texture {
-    constructor(path) {
+    constructor(path, image) {
         this.path = path;
+        if (image){
+            this.width = image.width;
+            this.height = image.height;
+            this.pixelData = getPixelDataFromImage(image);
+        }
+        
     }
+   
     async loadTexture() {
         var resArray = await getPixelData(this.path);
         this.width = resArray[0];

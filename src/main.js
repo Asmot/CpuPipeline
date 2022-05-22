@@ -14,8 +14,10 @@ camera.position(0, 0, 100);
 camera.update();
 
 var textureManager = new TextureManager();
-var texture = new Texture("http://127.0.0.1:8080/resource/spot_texture.png");
+var texture = new Texture("assets/marry/MC003_Kozakura_Mari.png");
 textureManager.addTexture(texture);
+
+
 
 // main render
 function main() {
@@ -39,5 +41,9 @@ function main() {
 }
 
 // after load resource , start main
+var assetsManager = new AssetsManager();
+assetsManager.addMtlPath("assets/marry/","Marry")
+assetsManager.loadAllAssets();
+
 var onload = main
 textureManager.loadTextures(onload)
