@@ -44,7 +44,9 @@ class TextureShader extends BasicShader {
     // point is vert_main return
     frag_main(point) {
         let uniforms = this.uniforms;
+        let sampleTexture = uniforms.uTexture;
+
         var texture = point.varyings.texture;
-        return uniforms.sampleTexture.sample(texture);
+        return sampleTexture.sample(texture[0], texture[1]);
     }
 }

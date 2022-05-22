@@ -27,10 +27,12 @@ function main() {
     }
 
     var shader = new BasicShader(uniforms);
+    var textureShader = new TextureShader(uniforms);
     
     draw(frameBuffer, testData_alix(), shader)
-    draw(frameBuffer, testData_zbuffer(), shader)
+    // draw(frameBuffer, testData_zbuffer(), shader)
     // draw(frameBuffer, testData0(), uniforms)
+    draw(frameBuffer, testTextureData(), textureShader)
 
     array_to_frame(ctx, frameBuffer)
     // draw_depth_buffer(ctx, frameBuffer)

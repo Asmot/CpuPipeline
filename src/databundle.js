@@ -11,6 +11,19 @@ function testData0() {
     }
 }
 
+function testTextureData() {
+    return  {
+        vert : [
+            0,    0,    0, 0, 0,
+            100,  0,    0, 1, 0,
+            100,  100,  0, 1, 1,
+            0,  100,    0, 0, 1
+        ],
+        vertStride : 5,
+        indeices : [0, 1, 2, 0, 2, 3]
+    }
+}
+
 function testData_zbuffer() {
     return  {
         vert : [

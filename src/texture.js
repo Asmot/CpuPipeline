@@ -29,7 +29,11 @@ class Texture {
         this.pixelData = resArray[2];
         console.log("[texture] loadTexture complete size " + this.width + " " + this.height)
     }
-    sample(x, y) {
+    // x y range is [0, 1]
+    // left bottom is (0,0), right top is (1,1)
+    sample(t_x, t_y) {
+        let x = Math.floor(this.width * t_x);
+        let y = Math.floor(this.height *  (1.0 - t_y));
         let r = this.pixelData[(x + y * this.width ) * 4] / 255;
         let g = this.pixelData[(x + y * this.width ) * 4 + 1] / 255;
         let b = this.pixelData[(x + y * this.width ) * 4 + 2] / 255;
