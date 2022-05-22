@@ -1,13 +1,4 @@
 
-/**
- * point is a map, contain gl_position :vec4 at lease
- * return color
- */
-function frag_main(point) {
-    var color = point.varyings.color;
-    return color;
-}
-
 class ColorWithBuffer {
     constructor(x, y, color, depth) {
         this.s_x = x;
@@ -20,7 +11,7 @@ class ColorWithBuffer {
 /**
  * return colors
  */
-function pixel_shadding(points, width, height) {
+function pixel_shadding(points, width, height, frag_main) {
     var colorWithBuffers = []
     var counter = 0;
     points.forEach(point => {

@@ -3,7 +3,7 @@
  * change framebuffer by meshdata and uniforms
  * 
  */
-function draw(frameBuffer, meshData, uniforms) {
+function draw(frameBuffer, meshData, uniforms, shader) {
 
     const vert = meshData.vert;
     const vertStride = meshData.vertStride;
@@ -11,7 +11,7 @@ function draw(frameBuffer, meshData, uniforms) {
 
 
     // step 1.0 vertex_processing
-    let points_processing = vert_processing(vert, vertStride, uniforms);
+    let points_processing = vert_processing(vert, vertStride, uniforms, shader.vert_main);
 
     // step 2.0  triangle_processing
     let triangles = triangle_processing(points_processing,indeices, PrimitiveTypeTriangles);
@@ -24,7 +24,7 @@ function draw(frameBuffer, meshData, uniforms) {
     console.log("triangles_interpolating culling point size " + triangles_interpolating.length);
 
     // step 4 shading
-    let colorWithBuffers = pixel_shadding(triangles_interpolating, width, height);
+    let colorWithBuffers = pixel_shadding(triangles_interpolating, width, height, shader.frag_main);
     console.log("colorWithBuffers point size " + colorWithBuffers.length);
 
     // step 4.1 depth-test

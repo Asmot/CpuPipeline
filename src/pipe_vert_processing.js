@@ -12,33 +12,6 @@ function getVec3(attributeData, attributeStride, index) {
 
 
 /**
- * shader vert main, return gl_Position
- * @param {*} attrItem each attribuet array 
- * @param {*} uniforms 
- * @returns {gl_Position : vec4, varyings : {}}
- */
-function vert_main(attrItemArray, uniforms) {
-    const aVert = vec4.fromValues(
-        attrItemArray[0],
-        attrItemArray[1],
-        attrItemArray[2],
-        1
-    );
-    const aColor = vec4.fromValues(
-        attrItemArray[3],
-        attrItemArray[4],
-        attrItemArray[5],
-        attrItemArray[6]
-    );
-    let mvpMat = mat4.create();
-    mat4.multiply(mvpMat, uniforms.projectionMatrix, uniforms.viewMatrix);
-    let position = transformMat4Triangle(aVert, mvpMat)
-    console.log("vert_main " + aVert +  " => " + position);
-    return {gl_Position : position, varyings : {color: aColor}};
-}
-
-
-/**
  * 1. get each pos from attribute data
  * 2. call vert main in shader, projection each position
  * @param {*} attributeData 
@@ -46,7 +19,7 @@ function vert_main(attrItemArray, uniforms) {
  * @param {*} uniforms 
  * @returns 
  */
-function vert_processing(attributeData, attributeStride, uniforms) {
+function vert_processing(attributeData, attributeStride, uniforms, vert_main) {
     const length = attributeData.length;
 
     var result = [];
