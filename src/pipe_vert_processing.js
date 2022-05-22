@@ -10,7 +10,6 @@ function getVec3(attributeData, attributeStride, index) {
     )
 }
 
-
 /**
  * 1. get each pos from attribute data
  * 2. call vert main in shader, projection each position
@@ -19,7 +18,7 @@ function getVec3(attributeData, attributeStride, index) {
  * @param {*} uniforms 
  * @returns 
  */
-function vert_processing(attributeData, attributeStride, uniforms, vert_main) {
+function vert_processing(attributeData, attributeStride, shader) {
     const length = attributeData.length;
 
     var result = [];
@@ -29,7 +28,7 @@ function vert_processing(attributeData, attributeStride, uniforms, vert_main) {
         for (let j = 0; j < attributeStride; j++) {
             new_arr[j] = attributeData[index + j];
         }
-        result[counter++] = vert_main(new_arr, uniforms)
+        result[counter++] = shader.vert_main(new_arr)
     }
     return result;
    

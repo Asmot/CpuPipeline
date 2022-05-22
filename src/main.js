@@ -13,8 +13,6 @@ var camera = new Camera(width, height);
 camera.position(0, 0, 100);
 camera.update();
 
-var shader = new BasicShader();
-
 function main() {
     var frameBuffer = new FrameBuffer(imgData, width, height);
 
@@ -22,9 +20,11 @@ function main() {
         viewMatrix : camera.getViewMatrix(),
         projectionMatrix : camera.getProjectionMatrix()
     }
+
+    var shader = new BasicShader(uniforms);
     
-    draw(frameBuffer, testData_alix(), uniforms, shader)
-    draw(frameBuffer, testData_zbuffer(), uniforms, shader)
+    draw(frameBuffer, testData_alix(), shader)
+    draw(frameBuffer, testData_zbuffer(), shader)
     // draw(frameBuffer, testData0(), uniforms)
 
     array_to_frame(ctx, frameBuffer)
