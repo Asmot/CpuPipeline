@@ -13,12 +13,17 @@ var camera = new Camera(width, height);
 camera.position(0, 0, 100);
 camera.update();
 
+var textureManager = new TextureManager();
+var texture = new Texture("http://127.0.0.1:8080/resource/spot_texture.png");
+textureManager.addTexture(texture);
+
+// main render
 function main() {
     var frameBuffer = new FrameBuffer(imgData, width, height);
-
     let uniforms = {
         viewMatrix : camera.getViewMatrix(),
-        projectionMatrix : camera.getProjectionMatrix()
+        projectionMatrix : camera.getProjectionMatrix(),
+        uTexture : texture
     }
 
     var shader = new BasicShader(uniforms);
@@ -31,4 +36,6 @@ function main() {
     // draw_depth_buffer(ctx, frameBuffer)
 }
 
-main();
+// after load resource , start main
+var onload = main
+textureManager.loadTextures(onload)
