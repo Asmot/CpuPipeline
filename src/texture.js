@@ -58,12 +58,15 @@ class TextureManager{
     addTexture(texture) {
         this.textures.push(texture);
     }
-    async loadTextures(onload) {
+    async loadTextures(onTextureload) {
        for (let index = 0; index < this.textures.length; index++) {
            const element = this.textures[index];
            await element.loadTexture();
        }
         console.log("[texture] textures load complete counter " + this.textures.length)
-        onload();
+        if (onTextureload) {
+            onTextureload();
+        }
+        
     }
 }

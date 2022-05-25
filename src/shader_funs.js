@@ -52,3 +52,32 @@ class TextureShader extends BasicShader {
         return sampleTexture.sample(texture[0], texture[1]);
     }
 }
+
+class PhongShader extends BasicShader {
+    vert_main(attrItemValues) {
+        let uniforms = this.uniforms;
+        // effect by the input data
+        // aPos : { attr : geo.attributes.position.array, stride : 3},
+        // aNormal : { attr : geo.attributes.normal.array, stride : 3},
+        // aCoord : { attr : geo.attributes.uv.array, stride : 2},
+
+        const aPos = vec4.fromValues(attrItemValues.aPos[0],attrItemValues.aPos[1],attrItemValues.aPos[2], 1);
+        const aCoord = vec2.fromValues(attrItemValues.aCoord[0],attrItemValues.aCoord[1]);
+
+        let mvpMat = mat4.create();
+
+        mat4.multiply(mvpMat, uniforms.projectionMatrix, uniforms.viewMatrix);
+        mat4.multiply(mvpMat, mvpMat, uniforms.uModelMatrix);
+        let position = transformMat4Triangle(aPos, mvpMat)
+
+        return {gl_Position : position, varyings : {texture: aCoord}};
+    }
+    // point is vert_main return
+    frag_main(point) {
+        let uniforms = this.uniforms;
+        let sampleTexture = uniforms.uTexture;
+
+        var texture = point.varyings.texture;
+        return sampleTexture.sample(texture[0], texture[1]);
+    }
+}

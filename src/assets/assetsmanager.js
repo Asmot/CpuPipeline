@@ -4,23 +4,23 @@ async function loadOBJ(manager, path, name, onLoad) {
 	function onProgress(xhr) {
 		if (xhr.lengthComputable) {
 			const percentComplete = xhr.loaded / xhr.total * 100;
-			console.log('model ' + Math.round(percentComplete, 2) + '% downloaded');
+			console.log('[asset] model ' + Math.round(percentComplete, 2) + '% downloaded');
 		}
 	}
-	function onError(e) { console.log("loadOBJ error " + e)}
+	function onError(e) { console.log("[asset] error: loadOBJ " + e)}
 
 	new THREE.MTLLoader(manager)
 		.setPath(path)
 		.setCrossOrigin( 'Anonymous')
 		.load(name + '.mtl', function (materials) {
 			materials.preload();
-			console.log("THREE.MTLLoader onload " + materials);
+			console.log("[asset] THREE.MTLLoader onload " + materials);
             setTimeout(function(){
                 new THREE.OBJLoader(manager)
                 .setMaterials(materials)
                 .setPath(path)
                 .load(name + '.obj', function (object) {
-                    console.log("THREE.OBJLoader onload " + object);
+                    console.log("[asset] THREE.OBJLoader onload " + object);
                     object.traverse(function (child) {
                         if (child.isMesh) {
                             let geo = child.geometry;
@@ -29,14 +29,11 @@ async function loadOBJ(manager, path, name, onLoad) {
                             else mat = child.material;
                             if (mat.map != null) {
                                 var dataBuffer = {
-                                    vert : [
-                                        geo.attributes.position.array,
-                                        geo.attributes.normal.array,
-                                        geo.attributes.uv.array
-                                    ],
-                                    vertStride : [
-                                        3, 3, 2
-                                    ],
+                                    attributes : {
+                                        aPos : { attr : geo.attributes.position.array, stride : 3},
+                                        aNormal : { attr : geo.attributes.normal.array, stride : 3},
+                                        aCoord : { attr : geo.attributes.uv.array, stride : 2},
+                                    },
                                     indeices : Array.from({ length: geo.attributes.position.count }, (v, k) => k),
                                     texture : new Texture("",  mat.map.image)
                                 }
@@ -47,6 +44,17 @@ async function loadOBJ(manager, path, name, onLoad) {
                 }, onProgress, onError);
         }, 100);
 		});
+}
+
+class AssetKey {
+    constructor(rootPath, name) {
+        this.rootPath = rootPath;
+        this.name = name;
+        this.key = this.getKey();
+    }
+    getKey() {
+        return this.rootPath + this.name;
+    }
 }
 
 function getKey(rootPath, name) {
@@ -62,12 +70,8 @@ class AssetsManager{
         this.mtlInfoList = {}
         this.mtlList = {}
     }
-    addMtlPath(rootPath, name) {
-        var key = getKey(rootPath, name);
-        this.mtlInfoList[key] = {
-            rootPath:rootPath,
-            name:name
-        }
+    addMtlPath(itemKey) {
+        this.mtlInfoList[itemKey.key] = itemKey;
     }
     async loadMtl(rootPath, name) {
         return new Promise((resolve, reject) => {
@@ -82,7 +86,7 @@ class AssetsManager{
         for (const key in this.mtlInfoList) {
             var infos = this.mtlInfoList[key];
             var dataBuffer = await this.loadMtl(infos.rootPath, infos.name)
-            this.mtlList[key, dataBuffer]
+            this.mtlList[key] = dataBuffer;
             console.log("[asset] loadMtl complete " + key)
         }
       
@@ -91,9 +95,8 @@ class AssetsManager{
             onLoad();
         }
     }
-    getMtlBuffer(rootPath, name) {
-        var key = getKey(rootPath, name);
-        return this.mtlList[key];
+    getMtlBuffer(itemKey) {
+        return this.mtlList[itemKey.key];
     }
 
 }
