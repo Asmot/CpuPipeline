@@ -5,13 +5,12 @@
  */
 function draw(frameBuffer, meshData, shader) {
 
-    const vert = meshData.vert;
-    const vertStride = meshData.vertStride;
+    const attributeData = meshData.attributes;
     const indeices = meshData.indeices;
 
 
     // step 1.0 vertex_processing
-    let points_processing = vert_processing(vert, vertStride, shader);
+    let points_processing = vert_processing(attributeData, shader);
 
     // step 2.0  triangle_processing
     let triangles = triangle_processing(points_processing,indeices, PrimitiveTypeTriangles);

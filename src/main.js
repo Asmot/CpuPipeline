@@ -33,7 +33,7 @@ function main() {
     
     draw(frameBuffer, testData_alix(), shader)
     // draw(frameBuffer, testData_zbuffer(), shader)
-    // draw(frameBuffer, testData0(), uniforms)
+    // draw(frameBuffer, testData0(), shader)
     draw(frameBuffer, testTextureData(), textureShader)
 
     array_to_frame(ctx, frameBuffer)
