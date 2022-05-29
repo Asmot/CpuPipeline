@@ -16,6 +16,40 @@ function dot_product(a, b) {
     return a[0] * b[0] + a[1] * b[1];
 }
 
+function minus3(a, b) {
+    return vec3.fromValues(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+}
+
+function dot_product3(a, b) {
+    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2] ;
+}
+
+function coross_product3(a, b) {
+    return vec3.fromValues(a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0])
+}
+
+
+
+function solveQuadratic(a, b,  c) {
+    var x0, x1;
+    var discr = b * b - 4 * a * c;
+    if (discr < 0)
+        return [false, x0, x1];
+    else if (discr == 0)
+        x0 = x1 = -0.5 * b / a;
+    else
+    {
+        var q = (b > 0) ? -0.5 * (b + sqrt(discr)) : -0.5 * (b - sqrt(discr));
+        x0 = q / a;
+        x1 = c / q;
+    }
+    if (x0 > x1)
+        return [false, x1, x0]
+    return [false, x0, x1];
+}
+
+
+
 function transformMat4Triangle(p, mvpMat) {
     const output = vec4.create();
     // const input = vec4.fromValues(p[0], p[1], p[2], p[3]);
