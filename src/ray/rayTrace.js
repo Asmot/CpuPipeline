@@ -49,7 +49,10 @@ function main() {
         [[0, 0], [1, 0], [1, 1], [0, 1]]
     );
 
-    var scene = [plane];
+    var sph1 = new Sphere(vec3.fromValues(-1, 0, -12), 2);
+    var sph2 = new Sphere(vec3.fromValues(0.5, -0.5, -8), 1.5);
+
+    var scene = [plane, sph1, sph2];
  
     var eye_pos = vec3.fromValues(0, 0, 2);
     for (let i = 0; i < width; i++) {

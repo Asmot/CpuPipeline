@@ -62,19 +62,19 @@ class MeshTriangle extends Object {
     getSurfaceProperties(P) {}
 }
 
-class Sephere extends Object {
+class Sphere extends Object {
     constructor(c, r) {
         super();
         this.center = c;
         this.radius = r;
         this.radius2 = r * r;
     }
-    intersect(orig, dir, tnear) {
+    intersect(O, D, tnear) {
         // analytic solution
-        var L = minus3(orig, center);
-        var a = dot_product3(dir, dir);
-        var b = 2 * dot_product3(dir, L);
-        var c = dot_product3(L, L) - radius2;
+        var OC = minus3(O, this.center);
+        var a = dot_product3(D, D);
+        var b = 2 * dot_product3(OC, D);
+        var c = dot_product3(OC, OC) - this.radius2;
         var t0, t1;
         var res = solveQuadratic(a, b, c)
         t0 = res[1];
@@ -91,7 +91,7 @@ class Sephere extends Object {
     }
     getSurfaceProperties(P) {
         var N = vec3.create();
-        vec3.normalize(N, minus3(P - center))
+        vec3.normalize(N, minus3(P - this.center))
         return N;
     }
 }
