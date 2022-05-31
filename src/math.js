@@ -20,12 +20,24 @@ function minus3(a, b) {
     return vec3.fromValues(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
 }
 
+function add3(a, b) {
+    return vec3.fromValues(a[0] + b[0], a[1] + b[1], a[2] + b[2]);
+}
+
 function dot_product3(a, b) {
     return a[0] * b[0] + a[1] * b[1] + a[2] * b[2] ;
 }
 
 function coross_product3(a, b) {
     return vec3.fromValues(a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0])
+}
+
+function mul3(a, v) {
+    return vec3.fromValues(a * v[0], a * v[1], a * v[2])
+}
+
+function reflect3(I, N){
+    return minus3(I , mul3(2 * dot_product3(I, N) , N));
 }
 
 // 求解一元二次方程的两个根 ax2 + bx + c = 0

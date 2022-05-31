@@ -52,7 +52,15 @@ function main() {
     var sph1 = new Sphere(vec3.fromValues(-1, 0, -12), 2);
     var sph2 = new Sphere(vec3.fromValues(0.5, -0.5, -8), 1.5);
 
-    var scene = [plane, sph1, sph2];
+    plane.setMaterialType(MaterialType_DIFFUSE_AND_GLOSSY);
+
+    var light1 = new Light(vec3.fromValues(-20, 70, 20), 0.5);
+    var light2 = new Light(vec3.fromValues(30, 50, -12), 0.5);
+
+    var scene = {
+        objects : [plane, sph1, sph2],
+        lights : [light1, light2]
+    };
  
     var eye_pos = vec3.fromValues(0, 0, 2);
     for (let i = 0; i < width; i++) {
@@ -68,8 +76,9 @@ function main() {
             // if (j === 0) {
             //     console.log(x + " " + y + " " + scale)
             // }
-            var color = castRay(eye_pos, dir, scene);
-            frameBuffer.changePosValue(i, j , color);
+            var hitColor = castRay(eye_pos, dir, scene);
+
+            frameBuffer.changePosValue(i, j , [hitColor[0], hitColor[1], hitColor[2], 1]);
         }
     }
 

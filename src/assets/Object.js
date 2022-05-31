@@ -1,10 +1,35 @@
 
+const MaterialType_DIFFUSE_AND_GLOSSY = 0;
+const MaterialType_REFLECTION_AND_REFRACTION = 1;
+const MaterialType_REFLECTION = 2;
+
+class Light {
+    constructor(p, i) {
+        this.position = p;
+        this.intensity = i;
+    }
+}
+
 class Object {
     constructor() {
-
+        this.materialType = MaterialType_DIFFUSE_AND_GLOSSY;
+        this.ior = 1.3;
+        this.Kd = 0.8;
+        this.Ks = 0.2;
+        this.diffuseColor = vec3.fromValues(0.2, 0.2, 0.2);
+        this.specularExponent = 25;
     }
     intersect(orig, dir, tnear){}
-    getSurfaceProperties(P) {}
+    getSurfaceProperties(P) {
+        
+        return []
+    }
+    setMaterialType(type) {
+        this.materialType = type;
+    }
+    evalDiffuseColor() {
+        return this.diffuseColor;
+    }
 }
 
 
@@ -15,6 +40,7 @@ class MeshTriangle extends Object {
         this.vertexIndex = indeices;
         this.coords = coords; 
         this.numTriangles = indeices.length / 3;
+        this.diffuseColor = vec3.fromValues(0.8, 0.2, 0.2);
     }
     rayTriangleIntersect(p0, p1, p2, O, D) {
     
@@ -42,6 +68,7 @@ class MeshTriangle extends Object {
         // 计算光线和 物体是否相交
         // 返回相交的位置
         var intersect = false; 
+        var index = 0;
         for (let k = 0; k < this.numTriangles; ++k) {
             // 从vert中找到三角形的三个顶点
             const v0 = this.vertices[this.vertexIndex[k * 3]];
@@ -53,13 +80,37 @@ class MeshTriangle extends Object {
                 var t = res[0]
                 if (t < tnear) {    
                     intersect |= true;
+                    index = k;
+                    tnear = t;
                 }
             }
         }
-        return intersect;
+        if (intersect) {
+            return {
+                index : index,
+                tnear : tnear
+            }
+        }
+        return undefined;
 
     }
-    getSurfaceProperties(P) {}
+    getSurfaceProperties(P) {
+        const index = P.index;
+        const v0 = this.vertices[this.vertexIndex[index * 3]];
+        const v1 = this.vertices[this.vertexIndex[index * 3 + 1]];
+        const v2 = this.vertices[this.vertexIndex[index * 3 + 2]];
+        
+        var e0 = vec3.create();
+        var e1 = vec3.create();
+        var N = vec3.create();
+        vec3.normalize(e0, minus3(v1 , v0));
+        vec3.normalize(e1, minus3(v2 , v1));
+        vec3.normalize(N, coross_product3(e0, e1));
+
+        return {
+            normal : N
+        };
+    }
 }
 
 class Sphere extends Object {
@@ -80,18 +131,23 @@ class Sphere extends Object {
         t0 = res[1];
         t1 = res[2];
         if (!res[0])
-            return false;
+            return undefined;
         if (t0 < 0)
             t0 = t1;
         if (t0 < 0)
-            return false;
+            return undefined;
         tnear = t0;
 
-        return true;
+        return {
+            index : 0,
+            tnear: tnear
+        }
     }
     getSurfaceProperties(P) {
         var N = vec3.create();
-        vec3.normalize(N, minus3(P - this.center))
-        return N;
+        vec3.normalize(N, minus3(P.position , this.center))
+        return {
+            normal : N
+        };
     }
 }
