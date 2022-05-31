@@ -52,6 +52,8 @@ function main() {
     var sph1 = new Sphere(vec3.fromValues(-1, 0, -12), 2);
     var sph2 = new Sphere(vec3.fromValues(0.5, -0.5, -8), 1.5);
 
+    sph1.setMaterialType(MaterialType_DIFFUSE_AND_GLOSSY)
+    sph2.setMaterialType(MaterialType_REFLECTION)
     plane.setMaterialType(MaterialType_DIFFUSE_AND_GLOSSY);
 
     var light1 = new Light(vec3.fromValues(-20, 70, 20), 0.5);

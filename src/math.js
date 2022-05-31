@@ -36,8 +36,14 @@ function mul3(a, v) {
     return vec3.fromValues(a * v[0], a * v[1], a * v[2])
 }
 
+// 计算反射光线 I是入射光线，N是法线
 function reflect3(I, N){
     return minus3(I , mul3(2 * dot_product3(I, N) , N));
+}
+
+function clamp(lo, hi, v)
+{
+    return Math.max(lo, Math.min(hi, v));
 }
 
 // 求解一元二次方程的两个根 ax2 + bx + c = 0

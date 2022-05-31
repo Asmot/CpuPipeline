@@ -1,6 +1,6 @@
 
 
-const MAX_DEPTH = 1;
+const MAX_DEPTH = 3;
 const BACKGROUND_COLOR = [1,1,1,1];
 
 
@@ -31,16 +31,45 @@ function trace(orig, dir, scene) {
     return undefined;
 }
 
+function fresnel(I, N, ior) {
+    var cosi = clamp(-1, 1, dot_product3(I, N));
+    var etai = 1, etat = ior;
+    if (cosi > 0) {  
+        var temp = etai;
+        etai = etat;
+        etat = temp;
+    }
+    // Compute sini using Snell's law
+    var sint = etai / etat * Math.sqrt(Math.max(0, 1 - cosi * cosi));
+    // Total internal reflection
+    if (sint >= 1) {
+        return 1;
+    } else {
+        var cost = Math.sqrt(Math.max(0, 1 - sint * sint));
+        cosi = Math.abs(cosi);
+        var Rs = ((etat * cosi) - (etai * cost)) / ((etat * cosi) + (etai * cost));
+        var Rp = ((etai * cosi) - (etat * cost)) / ((etai * cosi) + (etat * cost));
+        return (Rs * Rs + Rp * Rp) / 2;
+    }
+    // As a consequence of the conservation of energy, transmittance is given by:
+    // kt = 1 - kr;
+}
+
+// p = O + t * D
+// 加一个偏移，避免计算出来可以自己所在的三角形相交
+function getHitPointWithEpsilon(hitPoint, dir, N) {
+    var epsilon = 0.0001;
+    return (dot_product3(dir, N) < 0) ?
+                                add3(hitPoint , mul3(epsilon, N)) :
+                                minus3(hitPoint , mul3(epsilon,N)); 
+   
+}
+
 function phongShading(dir, N, scene, hitPoint, hitobj) {
     var lightAmt = 0, specularColor = 0;
     // phong shading
-    // p = O + t * D
-    // 加一个偏移，避免计算出来可以自己所在的三角形相交
-    var epsilon = 0.0001;
-    var shadowPointOrig = (dot_product3(dir, N) < 0) ?
-                                add3(hitPoint , mul3(epsilon, N)) :
-                                minus3(hitPoint , mul3(epsilon,N));
 
+    var shadowPointOrig = getHitPointWithEpsilon(hitPoint, dir, N);
    
     scene.lights.forEach(light => {
         var lightDir = minus3(light.position, hitPoint);
@@ -100,6 +129,15 @@ function castRay(orig, dir, scene, depth) {
 
         if (object.materialType === MaterialType_DIFFUSE_AND_GLOSSY) {
             return phongShading(dir, N, scene, hitPoint, payload.hitobj);
+        } else if(object.materialType == MaterialType_REFLECTION) {
+            // 反射光线，反射出一条新的光线，进行计算
+            var reflectRayDir = reflect3(dir, N);
+            vec3.normalize(reflectRayDir,reflectRayDir);
+            var reflectRayOrig = getHitPointWithEpsilon(hitPoint, dir, N);
+
+            var kr = fresnel(dir, N, object.ior);
+
+            hitColor = mul3(kr, castRay(reflectRayOrig, reflectRayDir, scene, depth + 1));
         }
 
         return hitColor;
