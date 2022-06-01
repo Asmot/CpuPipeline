@@ -10,7 +10,7 @@ class Light {
     }
 }
 
-class Object {
+class MeshObject {
     constructor() {
         this.materialType = MaterialType_DIFFUSE_AND_GLOSSY;
         this.ior = 1.3;
@@ -33,7 +33,7 @@ class Object {
 }
 
 
-class MeshTriangle extends Object {
+class MeshTriangle extends MeshObject {
     constructor(vert, indeices, coords) {
         super();
         this.vertices = vert;
@@ -113,7 +113,7 @@ class MeshTriangle extends Object {
     }
 }
 
-class Sphere extends Object {
+class Sphere extends MeshObject {
     constructor(c, r) {
         super();
         this.center = c;

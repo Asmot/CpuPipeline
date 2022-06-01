@@ -41,9 +41,26 @@ function reflect3(I, N){
     return minus3(I , mul3(2 * dot_product3(I, N) , N));
 }
 
-function clamp(lo, hi, v)
-{
+function clamp(lo, hi, v) {
     return Math.max(lo, Math.min(hi, v));
+}
+
+// 折射 光线
+function refract(I, N, ior) {
+    var cosi = clamp(-1, 1, dot_product3(I, N));
+    var etai = 1, etat = ior;
+    var n = N;
+    if (cosi < 0) { 
+        cosi = -cosi; 
+    } else { 
+        var temp = etat;
+        etat = etai;
+        etai = temp;
+        n= mul3(-1, N); 
+    }
+    var eta = etai / etat;
+    var k = 1 - eta * eta * (1 - cosi * cosi);
+    return k < 0 ? 0 : add3(mul3(eta , I), mul3((eta * cosi - Math.sqrt(k)) , n));
 }
 
 // 求解一元二次方程的两个根 ax2 + bx + c = 0

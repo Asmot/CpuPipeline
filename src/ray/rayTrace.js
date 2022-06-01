@@ -52,6 +52,8 @@ function main() {
     var sph1 = new Sphere(vec3.fromValues(-1, 0, -12), 2);
     var sph2 = new Sphere(vec3.fromValues(0.5, -0.5, -8), 1.5);
 
+    // sph1.setMaterialType(MaterialType_DIFFUSE_AND_GLOSSY)
+    // sph2.setMaterialType(MaterialType_REFLECTION_AND_REFRACTION)
     sph1.setMaterialType(MaterialType_DIFFUSE_AND_GLOSSY)
     sph2.setMaterialType(MaterialType_REFLECTION)
     plane.setMaterialType(MaterialType_DIFFUSE_AND_GLOSSY);
@@ -78,7 +80,7 @@ function main() {
             // if (j === 0) {
             //     console.log(x + " " + y + " " + scale)
             // }
-            var hitColor = castRay(eye_pos, dir, scene);
+            var hitColor = castRay(eye_pos, dir, scene, 1);
 
             frameBuffer.changePosValue(i, j , [hitColor[0], hitColor[1], hitColor[2], 1]);
         }
