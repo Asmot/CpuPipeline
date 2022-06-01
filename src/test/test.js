@@ -11,53 +11,50 @@ var defaultColor = '#FFFFFF';
 var fillColor = '#FF0000'
 ctx.fillStyle = fillColor
 
+function setColor(c) {
+    ctx.fillStyle = c
+}
 
 function drawPoint(x, y, w = 1, h = 1) {
    ctx.fillRect(x, y, w, h);
 }
 function clearColor() {
-    for (let x = 0; x < width; x++) {
-        for (let y = 0; y < height; y++) {
-            ctx.fillStyle = defaultColor
-            ctx.fillRect(x, y, 1, 1);
-        }
-    }
+    ctx.fillStyle = defaultColor
+    ctx.fillRect(0, 0, width, height);
     ctx.fillStyle = fillColor;
 }
 
-
 var controls = new function() {
     this.fresnel_ior = 0.5;
+    this.reflect_light_x = 100;
+    this.reflect_light_y = 100;
+    this.refract_light_x = 100;
+    this.refract_light_y = 100;
+    this.refract_ior = 1.3;
 };
 
 function createGUI() {
     const gui = new dat.gui.GUI();
     var fresnelFolder = gui.addFolder('Fresnel');
     fresnelFolder.add(controls, "fresnel_ior",0, 1).onChange(draw_fresnel);
-    
+
+    var reflectFolder = gui.addFolder('Reflect');
+    reflectFolder.add(controls, "reflect_light_x",-width / 2, width /2).onChange(draw_reflect);
+    reflectFolder.add(controls, "reflect_light_y",-height / 2, height /2).onChange(draw_reflect);
+
+    var refractFolder = gui.addFolder('Refract');
+    refractFolder.add(controls, "refract_light_x",-width / 2, width /2).onChange(draw_refract);
+    refractFolder.add(controls, "refract_light_y",-height / 2, height /2).onChange(draw_refract);
+    refractFolder.add(controls, "refract_ior",0, 2).onChange(draw_refract);
+
+
     gui.open();
   
 }
 createGUI();
 
 
-function draw_fresnel() {
-    clearColor()
-    for (let index = 0; index < 180; index++) {
-        var rad = degreeToRadian(index);
-        var dir = [Math.cos(rad), 0, Math.sin(rad)];
-        var N = [0,0,1];
-        var ior = 0.4;
-        var res = fresnel(dir, N, controls.fresnel_ior);
-        // console.log("fresnel cal " + index + " " + N + " " + ior + " => " + res);
-
-        var x = width * index / 180;
-        var y = height - height * res;
-        // console.log("fresnel cal " + x + " " + y);
-
-        drawPoint(x, y, 2, 2)
-    }
-}
 
 
-draw_fresnel()
+
+draw_reflect()
