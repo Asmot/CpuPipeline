@@ -109,7 +109,7 @@ function main() {
     right.diffuseColor = vec3.fromValues(0,1,0);
     light.diffuseColor = vec3.fromValues(1,1,1);
 
-    var light1 = new Light(vec3.fromValues(278, 278, 278), 1);
+    var light1 = new Light(vec3.fromValues(353.0, 508.7,302.0), 1);
 
     var scene = {
         objects : [left, right, shortbox, tallbox, light, floor],
@@ -120,20 +120,20 @@ function main() {
     for (let i = 0; i < width; i++) {
         for (let j = 0; j < height; j++) {
             var x,y;
-            // x = i / width - 0.5; 
-            // x = 2 * x * scale * imageAspectRatio;
-            // y = (height - 1 - j) / height - 0.5;
-            // y = 2 * y * scale;
-
-            x = ((i - width / 2) / width) * scale * imageAspectRatio; 
-            y = ((height/ 2  - j) / height)  * scale;
+            
+            // 从eye pos 朝着一个方向发出n条光线
+            // x = ((i - width / 2) / width) * scale * imageAspectRatio; 
+            // y = ((height/ 2  - j) / height)  * scale;
+            x = (i - width / 2) * scale * imageAspectRatio; 
+            y = (height/ 2  - j) * scale;
             // if (j === height / 2) {
             //     console.log(i + "," + j + " = >" + x + "," + y)
             // }
 
-            // var pos = vec3.fromValues(x, y, 0);
-            // var dir = minus3(pos, eye_pos);
-            var dir = vec3.fromValues(-x, y, 1);
+            // x y 是近平面上的点，和x0y 所在平面平行，坐标是世界坐标，相机的z+上近平面的距离 得到近平面的z
+            var near = 400;
+            var pos = vec3.fromValues(x + eye_pos[0], y + eye_pos[1], eye_pos[2] + near);
+            var dir = minus3(pos, eye_pos);
             vec3.normalize(dir,dir);
             // console.log(dir)
             // if (j === 0) {
