@@ -34,9 +34,22 @@ class MeshObject {
 
 
 class MeshTriangle extends MeshObject {
-    constructor(vert, indeices, coords) {
+    constructor(vert, indeices, coords, stride = -1) {
         super();
-        this.vertices = vert;
+        if(stride == -1) {
+            this.vertices = vert
+        } else {
+            this.vertices = []
+            const totalCount = vert.length / stride;
+            for (let index = 0; index < totalCount; index++) {
+                this.vertices[index] = vec3.fromValues(
+                    vert[index * stride],
+                    vert[index * stride + 1],
+                    vert[index * stride + 2]
+                )
+            }
+        }
+        
         this.vertexIndex = indeices;
         this.coords = coords; 
         this.numTriangles = indeices.length / 3;
