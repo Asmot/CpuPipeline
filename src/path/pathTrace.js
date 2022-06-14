@@ -139,7 +139,7 @@ function main() {
             // if (j === 0) {
             //     console.log(x + " " + y + " " + scale)
             // }
-            var hitColor = castRay(eye_pos, dir, scene, 1);
+            var hitColor = castPath(eye_pos, dir, scene, 1);
 
             frameBuffer.changePosValue(i, j , [hitColor[0], hitColor[1], hitColor[2], 1]);
         }

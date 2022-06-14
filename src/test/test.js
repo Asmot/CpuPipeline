@@ -31,6 +31,7 @@ var controls = new function() {
     this.refract_light_x = 100;
     this.refract_light_y = 100;
     this.refract_ior = 1.3;
+    this.pdf_sample_count = 100;
 };
 
 function createGUI() {
@@ -47,7 +48,9 @@ function createGUI() {
     refractFolder.add(controls, "refract_light_y",-height / 2, height /2).onChange(draw_refract);
     refractFolder.add(controls, "refract_ior",0, 2).onChange(draw_refract);
 
-
+    var refractFolder = gui.addFolder('Path');
+    refractFolder.add(controls, "pdf_sample_count",1, 1000).onChange(draw_pdf);
+  
     gui.open();
   
 }
