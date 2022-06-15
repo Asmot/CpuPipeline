@@ -5,11 +5,14 @@ const BACKGROUND_COLOR = [1,1,1,1];
 
 
 function trace(orig, dir, scene) {
+    return traceObjects(orig, dir, scene.objects)
+}
 
+function traceObjects(orig, dir, objects) {
     var tnear = 10000000;
     var haveIntersect = false;
     var payLoad = {};
-    scene.objects.forEach(object => {
+    objects.forEach(object => {
         // 检查光线和物体是否相交
         var res = object.intersect(orig, dir, tnear);
         if (res) {
@@ -105,10 +108,11 @@ function pdf_sephere(N) {
     var counter = 0;
 
     var n = Math.sqrt(N);
+    var step = 180 / n;
 
     var r = 1;
-    for (let a = 0; a < 180; a+=n) {
-        for (let b = 0; b < 180; b+=n) {
+    for (let a = 0; a < 180; a+=step) {
+        for (let b = 0; b < 180; b+=step) {
             var a_r = degreeToRadian(a);
             var b_r = degreeToRadian(b);
             var x = 1 * Math.sin(a_r) * Math.cos(b_r);

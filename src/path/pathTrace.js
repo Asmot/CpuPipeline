@@ -113,7 +113,9 @@ function main() {
 
     var scene = {
         objects : [left, right, shortbox, tallbox, light, floor],
-        lights : [light1]
+        lights : [light1],
+        areaLights: [light]
+
     };
  
     var eye_pos = vec3.fromValues(controls.eye_x, controls.eye_y, controls.eye_z);
@@ -143,6 +145,8 @@ function main() {
 
             frameBuffer.changePosValue(i, j , [hitColor[0], hitColor[1], hitColor[2], 1]);
         }
+        var progress = Math.ceil(100 * i / width);
+        console.log("progress " +  progress + "%")
     }
 
     // for (let i = 0; i < width; i++) {

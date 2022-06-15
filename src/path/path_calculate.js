@@ -1,8 +1,46 @@
 
+var N = 100;
+var shade_samples = pdf_sephere(N);
 
-function shade(p, wo) {
+
+function areaLightPhongShading(dir, N, hitPoint, hitobj, lightPos, intensity) {
+    var lightAmt = 0, specularColor = 0;
+    var lightDir = minus3(lightPos, hitPoint);
+    // 起点到光源的距离
+    var lightDistance2 = dot_product3(lightDir, lightDir);
+    vec3.normalize(lightDir, lightDir);
+    
+    var LdotN = Math.max(0, dot_product3(lightDir, N));
+    lightAmt += intensity * LdotN;
+    // var reflectionDirection = reflect3(mul3(-1, lightDir), N);
+    // var color = 
+    // specularColor += Math.pow(Math.max(0, -dot_product3(reflectionDirection, dir)),
+    //     payload.hitobj.specularExponent) * light.intensity;
+    
+
+    return mul3(lightAmt * hitobj.Kd , hitobj.evalDiffuseColor());// + specularColor * payload.hitobj.Ks;
+}
+
+
+function shade(p, areaLights, object, N) {
     // 使用pdf 在 范围内随机采用
+    var Lo = vec3.fromValues(0, 0, 0);
+    shade_samples.forEach(wi => {
+        var payload = traceObjects(p, wi, areaLights);
+        // 如果光线射中光源， 则说明被光源直接照到
+        if (payload) {
+            // 沿着光线方向 计算出来 面光源上的一个位置
+            var hitPoint = add3(p , mul3(payload.tnear, wi));
+            var light = payload.hitobj;
+            var color = light.diffuseColor;
+            color = mul3(1 / (2 * Math.PI), color);
+            Lo = mul3(1 / N, add3(Lo, color))
+            Lo = light.diffuseColor;
 
+            Lo = areaLightPhongShading(wi, N, p, object, hitPoint, 0.5);
+        }
+    });
+    return Lo;
 }
 
 /**
@@ -37,7 +75,7 @@ function castPath(orig, dir, scene, depth) {
         // 这个点 四面八方来的光 和brdf作用后的结果
         // 蒙特卡洛 半球面上的积分 约等于 半球面上 N个采样点求和平均
         //    采样方式就是pdf
-        
+        hitColor = shade(hitPoint, scene.areaLights, object, N);
 
         
 
