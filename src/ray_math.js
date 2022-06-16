@@ -127,3 +127,9 @@ function pdf_sephere(N) {
     }
     return samples;
 }
+
+// 在一个区域内采样
+// 实现在光源区域采样
+function pfd_area(N, area) {
+
+}
