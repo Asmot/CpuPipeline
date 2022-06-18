@@ -109,6 +109,22 @@ function main() {
     right.diffuseColor = vec3.fromValues(0,1,0);
     light.diffuseColor = vec3.fromValues(1,1,1);
 
+    light.setMaterial({
+        // 漫反射颜色
+        Kd : [0.65,0.65,0.65],
+        // 光发射的能量
+        emission: 
+        add3(
+            add3(
+                mul3(8, [0.747+0.058, 0.747+0.258, 0.747]),
+                mul3(15.6, [0.740+0.287,0.740+0.160,0.740])
+            ),
+            mul3(18.4, [0.737+0.642,0.737+0.159,0.737])
+        )
+    })
+
+    light.isLight = true;
+
     var light1 = new Light(vec3.fromValues(353.0, 508.7,302.0), 1);
 
     var scene = {

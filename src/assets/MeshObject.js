@@ -18,6 +18,7 @@ class MeshObject {
         this.Ks = 0.2;
         this.diffuseColor = vec3.fromValues(0.2, 0.2, 0.2);
         this.specularExponent = 25;
+        this.isLight = false;
     }
     intersect(orig, dir, tnear){}
     getSurfaceProperties(P) {
@@ -29,6 +30,20 @@ class MeshObject {
     }
     evalDiffuseColor() {
         return this.diffuseColor;
+    }
+    getArea() {
+        return 0;
+    }
+    sample_pdf() {
+    }
+    setMaterial(m) {
+        this.material = m
+    }
+}
+
+function triangle_sample_pdf(v0, v1, v2) {
+    return {
+
     }
 }
 
@@ -54,6 +69,49 @@ class MeshTriangle extends MeshObject {
         this.coords = coords; 
         this.numTriangles = indeices.length / 3;
         this.diffuseColor = vec3.fromValues(0.8, 0.2, 0.2);
+        this.calArea();
+    }
+    calArea() {
+        this.area = 0;
+        for (let k = 0; k < this.numTriangles; ++k) {
+            // 从vert中找到三角形的三个顶点
+            const v0 = this.vertices[this.vertexIndex[k * 3]];
+            const v1 = this.vertices[this.vertexIndex[k * 3 + 1]];
+            const v2 = this.vertices[this.vertexIndex[k * 3 + 2]];
+            var e1 = minus3(v1, v0);
+            var e2 = minus3(v2, v0);
+
+            var c_p =  coross_product3(e1, e2)
+            this.area += vec3.length(c_p) * 0.5;
+        }
+    }
+    sample_pdf() {
+        // 随机找到一个三角形
+        // 在三角形内随机找一个点
+        var k = Math.floor(Math.random() * this.numTriangles);
+        const v0 = this.vertices[this.vertexIndex[k * 3]];
+        const v1 = this.vertices[this.vertexIndex[k * 3 + 1]];
+        const v2 = this.vertices[this.vertexIndex[k * 3 + 2]];
+
+        var e1 = minus3(v1, v0);
+        var e2 = minus3(v2, v0);
+        var c_p =  coross_product3(e1, e2)
+        var normal = vec3.create();
+        vec3.normalize(normal, c_p);
+
+        var pos = vec3.create();
+        var x = Math.random();
+        var y = Math.random();
+        pos[0] =  v0[0] * (1.0 - x) + v1[0] * (x * (1.0 - y)) + v2[0] * (x * y);
+        pos[1] =  v0[1] * (1.0 - x) + v1[1] * (x * (1.0 - y)) + v2[1] * (x * y);
+        pos[2] =  v0[2] * (1.0 - x) + v1[2] * (x * (1.0 - y)) + v2[2] * (x * y);
+       
+
+        return {
+            pos: pos,
+            normal :normal,
+            pdf : 1 / this.area
+        }
     }
     rayTriangleIntersect(p0, p1, p2, O, D) {
     
@@ -123,6 +181,9 @@ class MeshTriangle extends MeshObject {
         return {
             normal : N
         };
+    } 
+    getArea() {
+        return this.area;
     }
 }
 

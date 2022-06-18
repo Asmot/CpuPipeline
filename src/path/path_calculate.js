@@ -1,9 +1,15 @@
-var SampleNumber = 100;
+
+var SampleNumber = 1;
 
 var half_sephere_sample = {
-    shade_samples : pdf_sephere(SampleNumber),
+    samples : pdf_sephere(SampleNumber),
     // 平均采样，在半球上任意一点的概率密度 都是 1 / 2π
      pdf_wi : 1 / (2 * Math.PI)
+}
+
+var area_sample = {
+    samples : pdf_sephere(SampleNumber),
+    pdf_wi : 1 / (2 * Math.PI)
 }
 
 var sample = half_sephere_sample;
@@ -20,37 +26,146 @@ function areaLightPhongShading(phongItem) {
     return result;
 }
 
-function shade(p, areaLights, object, N) {
-    // 使用pdf 在 范围内随机采用
-    var Lo = vec3.fromValues(0, 0, 0);
-    sample.shade_samples.forEach(wi => {
-        var payload = traceObjects(p, wi, areaLights);
-        // 如果光线射中光源， 则说明被光源直接照到
-        if (payload) {
-            // 沿着光线方向 计算出来 面光源上的一个位置
-            var hitPoint = add3(p , mul3(payload.tnear, wi));
+// 在光源 范围内随机采样,认为是平均采样
+// pdf 1 / 是光源的面积
+function getAreaSample(areaLights, p) {
+    var areaLight = areaLights[0]
+    var pdf_area = 1 / areaLight.getArea();
+    var samples = [];
+    for(let i = 0; i < SampleNumber; i ++) {
+        var random_sample = areaLight.sample_pdf();
 
-            // L0 = L0 + (1/Number) * Li * fr * cosine / pdf(wi)
-            var phongItem = {
-                lightColor : payload.hitobj.diffuseColor,
-                normal : N,
-                lightDir : wi,
-                lightPos: hitPoint,
-                ambientStrength : 0.1,
-                objectColor: object.evalDiffuseColor()
-            }
-            // 使用phong作为brdf， phong会计算出这个点的颜色
-            // 用这个颜色替换  Li * fr * cosine
-            var f_r_cos = areaLightPhongShading(phongItem);
-            // L0 += (1/Number) * f_r_cos / pdf(wi)
-            var pdf_wi = sample.pdf_wi;
-            f_r_cos = mul3(1 / pdf_wi, f_r_cos);
-            var f_r_cos_n = mul3(1 / SampleNumber, f_r_cos);
-            Lo = add3(Lo, f_r_cos_n)
-        }
-    });
-    return mul3(10,Lo);
+        // 光源上的位置 - 物体位置得到光线方向
+        var dir = minus3(random_sample.pos, p);
+        vec3.normalize(dir, dir)
+        samples[i] = {
+            wi:dir,
+            normal:random_sample.normal,
+            pos:random_sample.pos,
+            emission:areaLight.material.emission
+        };
+    }
+
+    return {
+        samples : samples,
+        pdf_wi : pdf_area
+    } 
 }
+
+function shade(p, scene, object, N) {
+    // 使用pdf 在 范围内随机采用
+    sample = getAreaSample(scene.areaLights, p);
+
+    var Lo = vec3.fromValues(0, 0, 0);
+    sample.samples.forEach(item => {
+        var wi = item.wi;
+        var light_wi_normal = item.normal;
+        var lightPos_3 = item.pos;
+        var lightEmission = item.emission;
+        var pdf_wi = sample.pdf_wi
+        
+        // 1 在光源采样
+        // 2.1 计算当前位置到采样点的向量 wi
+        // 2.2 从当前位置沿着wi发射光线，和场景计算相交，判断相交点是不是光源采样点， 判断是否存在遮挡
+        //      如果没有遮挡则是直接光照
+        // L0 = L0 + (1/Number) * Li * fr * cosine / pdf(wi)
+        var p_3 = p;
+        var p_to_light_3 = minus3(lightPos_3, p_3);
+       
+        // 当前位置到采样点的向量是 wi
+        var wi_dir = mul3(1, p_to_light_3); // 不能直接复制，否则
+        vec3.normalize(wi_dir, wi_dir)
+        // 点到光源的距离平方计算
+        var dis_p_to_light_square = dot_product3(p_to_light_3, p_to_light_3);
+
+
+        // 发射光线和场景求交点，判断是否被遮挡
+        var payload = trace(p_3, wi_dir, scene);
+        if (payload) {
+            // 判断交点是否是光源采样点
+            var hitPoint = add3(p_3 , mul3(payload.tnear, wi_dir));
+            // 计算交点和采样点到圆点的距离是否相同
+            var len_offset = vec3.length(minus3(hitPoint , p_3)) - vec3.length(p_to_light_3);
+            // var len_offset = vec3.length(hitPoint) - vec3.length(p_to_light_3);
+            // if (len_offset <= 0 && len_offset > -0.5)
+            //  {
+            if (1) {
+                // 是同一个点，说明当前位置和采样点直接没有遮挡，是直接照射
+               
+                // - wi_dir 就是采样点 发出的能量 照射到当前位置的方向
+                var cos_light_dir_with_light_normal = dot_product3(mul3(-1, wi_dir), light_wi_normal)
+                var Li_3 = mul3(cos_light_dir_with_light_normal / dis_p_to_light_square, lightEmission);
+
+                // 漫反射均匀分布，在半球面上，每个方向的漫反射相同
+                var fr_3 = mul3(1 / (1 * Math.PI), object.diffuseColor)
+
+                // 光线和当前位置法线的夹角
+                var cos_p_to_light_with_p_normal = dot_product3(wi_dir, N);
+
+                 // L0 = L0 + (1/Number) * Li * fr * cosine / pdf(wi)
+                var result = vec3.create();
+                vec3.multiply(result, Li_3, fr_3);
+
+                 Lo = add3(Lo, mul3((1 / SampleNumber) * cos_p_to_light_with_p_normal / pdf_wi, result))
+            }
+        }
+
+        // 参考代码
+        // var intersection_coords = p;
+        // var lightpos_coords = lightPos_3;
+        // var lightpdf = sample.pdf_wi;
+        // //sampleLight(lightpos, lightpdf);
+        // var collisionlight = minus3(lightpos_coords, intersection_coords);
+        // var dis = dot_product3(collisionlight, collisionlight);
+        // // var collisionlightdir = collisionlight.normalized();   
+        // var collisionlightdir = collisionlight;   
+        // vec3.normalize(collisionlightdir,collisionlightdir)
+
+        // // Ray light_to_object_ray(intersection_coords, collisionlightdir);
+       
+        // // Intersection light_to_anything_ray = Scene::intersect(light_to_object_ray);
+        // var light_to_anything_ray = trace(intersection_coords, collisionlightdir, scene);
+
+        // // var f_r = intersection.m -> eval(ray.direction, collisionlightdir, intersection.normal);
+        // var fr_3 = mul3(1 / (Math.PI), object.diffuseColor);
+        // if (light_to_anything_ray) {
+        //     var hitPoint = add3(intersection_coords , mul3(light_to_anything_ray.tnear, collisionlightdir));
+        //     var light_to_anything_ray_distance = vec3.length(hitPoint);
+        //     var collisionlight_norm = vec3.length(collisionlight);
+        //     if (light_to_anything_ray_distance - collisionlight_norm > -0.005) {  
+        //         //L_dir = L_i * f_r * cos_theta * cos_theta_x / |x - p | ^ 2 / pdf_light
+
+        //         var lightpos_emit = lightEmission;
+        //         var f_r = fr_3;
+        //         // 当前位置的法线
+        //         var intersection_normal = N;
+        //         var cos_theta = dot_product3(collisionlightdir, intersection_normal);
+        //         var lightpos_normal = light_wi_normal;
+
+        //         var cos_theta_x = dot_product3(mul3(-1,collisionlightdir), lightpos_normal)
+                
+        //         // L_dir = lightpos.emit * f_r * dotProduct(collisionlightdir, intersection.normal) * dotProduct(-collisionlightdir, lightpos.normal) / dis / lightpdf;
+        //         var l_i_f_r = vec3.create();
+        //         vec3.multiply(l_i_f_r, lightpos_emit, f_r);
+        //         L_dir = mul3(cos_theta * cos_theta_x / dis / lightpdf, l_i_f_r) ;
+        //         // Lo = L_dir;
+        //         Lo = add3(Lo, mul3(1 / SampleNumber, L_dir))
+        //     }
+        // }
+        
+
+      
+        
+       
+
+
+
+        
+      
+    });
+    return Lo;
+}
+
 
 /**
  * orig 是光线起点
@@ -85,7 +200,7 @@ function castPath(orig, dir, scene, depth) {
         // 蒙特卡洛 半球面上的积分 约等于 半球面上 N个采样点求和平均
         //    采样方式就是pdf
 
-        hitColor = shade(hitPoint, scene.areaLights, object, N);
+        hitColor = shade(hitPoint, scene, object, N);
 
         
 
