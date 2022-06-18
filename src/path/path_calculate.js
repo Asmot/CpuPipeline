@@ -68,7 +68,7 @@ function shade(p, scene, object, N) {
         // 2.1 计算当前位置到采样点的向量 wi
         // 2.2 从当前位置沿着wi发射光线，和场景计算相交，判断相交点是不是光源采样点， 判断是否存在遮挡
         //      如果没有遮挡则是直接光照
-        // L0 = L0 + (1/Number) * Li * fr * cosine / pdf(wi)
+        // L0 = L0 + (1/Number) * Li * fr * cosine / pdf(wi)/*  */
         var p_3 = p;
         var p_to_light_3 = minus3(lightPos_3, p_3);
        
@@ -80,16 +80,15 @@ function shade(p, scene, object, N) {
 
 
         // 发射光线和场景求交点，判断是否被遮挡
-        var payload = trace(p_3, wi_dir, scene);
+        // 避免和自己相交 添加一个偏移
+        var rayOrig = getHitPointWithEpsilon(p_3, mul3(-1,wi_dir), N);
+        var payload = trace(rayOrig, wi_dir, scene);
         if (payload) {
             // 判断交点是否是光源采样点
             var hitPoint = add3(p_3 , mul3(payload.tnear, wi_dir));
-            // 计算交点和采样点到圆点的距离是否相同
+            // 计算交点和采样点是否相同
             var len_offset = vec3.length(minus3(hitPoint , p_3)) - vec3.length(p_to_light_3);
-            // var len_offset = vec3.length(hitPoint) - vec3.length(p_to_light_3);
-            // if (len_offset <= 0 && len_offset > -0.5)
-            //  {
-            if (1) {
+            if (len_offset < 0.005) {
                 // 是同一个点，说明当前位置和采样点直接没有遮挡，是直接照射
                
                 // - wi_dir 就是采样点 发出的能量 照射到当前位置的方向
