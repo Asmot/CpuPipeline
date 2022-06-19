@@ -95,8 +95,9 @@ function shade_direct(p, scene, object, N) {
         // 判断交点是否是光源采样点
         var hitPoint = add3(p_3 , mul3(payload.tnear, wi_dir));
         // 计算交点和采样点是否相同
-        var len_offset = vec3.length(minus3(hitPoint , p_3)) - vec3.length(p_to_light_3);
-        if (len_offset < 0.005) {
+        var len_offset = vec3.length(minus3(hitPoint , lightPos_3));
+
+        if (len_offset < 0.001) {
             // 是同一个点，说明当前位置和采样点直接没有遮挡，是直接照射
             
             // - wi_dir 就是采样点 发出的能量 照射到当前位置的方向
@@ -118,7 +119,7 @@ function shade_direct(p, scene, object, N) {
             var result = vec3.create();
             vec3.multiply(result, Li_3, fr_3);
 
-                Lo = add3(Lo, mul3((1 / SampleNumber) * cos_p_to_light_with_p_normal / pdf_wi, result))
+            Lo = add3(Lo, mul3((1 / SampleNumber) * cos_p_to_light_with_p_normal / pdf_wi, result))
         }
     }
 
