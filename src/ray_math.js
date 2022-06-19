@@ -128,6 +128,49 @@ function pdf_sephere(N) {
     return samples;
 }
 
+// normal 所在半球随机 去一个点，单位向量
+function random_sephere(normal) {
+    
+    // var a = Math.random() * 180;
+    // var b = Math.random() * 180;
+    // var a_r = degreeToRadian(a);
+    // var b_r = degreeToRadian(b);
+    // var x = 1 * Math.sin(a_r) * Math.cos(b_r);
+    // var y = 1 * Math.sin(a_r) * Math.sin(b_r);
+    // var z = 1 * Math.cos(a_r);
+
+    // var dir = vec3.fromValues(x, y, z);
+    // vec3.normalize(dir, dir);
+
+    // dir = add3(dir, normal);
+    // vec3.normalize(dir, dir);
+
+    var x_1 = Math.random();
+    var x_2 = Math.random();
+
+    var z = Math.abs(1.0 - 2.0 * x_1);
+    var r = Math.sqrt(1.0 - z * z);
+    var phi = 2 * Math.PI * x_2;
+
+    var a = vec3.fromValues(r*Math.cos(phi), r*Math.sin(phi), z);
+
+    var B, C;
+    if (Math.abs(normal[0]) > Math.abs(normal[1])){
+        var invLen = 1.0 / Math.sqrt(normal[0] * normal[0] + normal[2] * normal[2]);
+        C = vec3.fromValues(normal[2] * invLen, 0.0, -normal[0] *invLen);
+    } else {
+        var invLen = 1.0 / Math.sqrt(normal[1] * normal[1] + normal[2] * normal[2]);
+        C = vec3.fromValues(0.0, normal[2] * invLen, -normal[1] *invLen);
+    }
+    B = coross_product3(C, normal);
+    return add3(
+        add3(mul3(a[0] , B) , 
+             mul3(a[1] , C)
+            ),
+        mul3(a[2] , normal)
+    );
+}
+
 // 在一个区域内采样
 // 实现在光源区域采样
 function pfd_area(N, area) {

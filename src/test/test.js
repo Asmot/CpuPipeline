@@ -33,6 +33,7 @@ var controls = new function() {
     this.refract_ior = 1.3;
     this.pdf_sample_count = 100;
     this.pdf_mesh_sample_count = 100;
+    this.random_sephere_count = 100;
 };
 
 function createGUI() {
@@ -52,7 +53,7 @@ function createGUI() {
     var refractFolder = gui.addFolder('Path');
     refractFolder.add(controls, "pdf_sample_count",1, 1000).onChange(draw_pdf);
     refractFolder.add(controls, "pdf_mesh_sample_count",1, 1000).onChange(drawMeshPdfSample);
-  
+    refractFolder.add(controls, "random_sephere_count",1, 1000).onChange(drwa_random_sephere);
 
     gui.open();
   
