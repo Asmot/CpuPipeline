@@ -158,7 +158,7 @@ function main() {
             //     console.log(x + " " + y + " " + scale)
             // }
             var hitColor = vec3.fromValues(0,0,0)
-            const SSP = 1;
+            const SSP = 64;
             // 路径追踪每次都是 随机发射一条路径去计算，可以多次计算取平均值
             for (let k = 0; k < SSP; k ++) {
                 var res_3 = castPath(eye_pos, dir, scene, 1);
