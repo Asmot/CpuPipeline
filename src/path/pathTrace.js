@@ -133,7 +133,8 @@ function main() {
         areaLights: [light]
 
     };
- 
+
+    var near = 400;
     var eye_pos = vec3.fromValues(controls.eye_x, controls.eye_y, controls.eye_z);
     for (let i = 0; i < width; i++) {
         for (let j = 0; j < height; j++) {
@@ -149,7 +150,6 @@ function main() {
             // }
 
             // x y 是近平面上的点，和x0y 所在平面平行，坐标是世界坐标，相机的z+上近平面的距离 得到近平面的z
-            var near = 400;
             var pos = vec3.fromValues(x + eye_pos[0], y + eye_pos[1], eye_pos[2] + near);
             var dir = minus3(pos, eye_pos);
             vec3.normalize(dir,dir);
@@ -157,13 +157,23 @@ function main() {
             // if (j === 0) {
             //     console.log(x + " " + y + " " + scale)
             // }
-            var hitColor = castPath(eye_pos, dir, scene, 1);
-
+            var hitColor = vec3.fromValues(0,0,0)
+            const SSP = 1;
+            // 路径追踪每次都是 随机发射一条路径去计算，可以多次计算取平均值
+            for (let k = 0; k < SSP; k ++) {
+                var res_3 = castPath(eye_pos, dir, scene, 1);
+                hitColor = add3(hitColor, mul3(1 / SSP, res_3));
+            }
+            
             frameBuffer.changePosValue(i, j , [hitColor[0], hitColor[1], hitColor[2], 1]);
         }
         var progress = Math.ceil(100 * i / width);
         console.log("progress " +  progress + "%")
     }
+
+    // draw ray path
+    console.log(lastRayPath)
+
 
     // for (let i = 0; i < width; i++) {
     //     for (let j = 0; j < height; j++) {

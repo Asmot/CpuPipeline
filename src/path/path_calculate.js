@@ -1,4 +1,7 @@
 
+var lastRayPath = []
+var curRayPath = []
+
 // 路径追踪只会采样一个点
 var SampleNumber = 1;
 
@@ -166,88 +169,106 @@ function shade_direct(p, scene, object, N) {
 }
 
 
-// 先计算直接光照，再计算间接光照
-function shade(p, scene, object, N) {
+/**
+ * 
+ * @param {*} p 要计算的位置
+ * @param {*} scene 场景
+ * @param {*} object 位置所在的物体
+ * @param {*} N 位置 所在的法线
+ */
+function shade(p, scene, object, N, depth) {     
 
-          
+    if (object.material && object.material.emission) {
+        // hit到了光源, 直接返回光源的颜色
+        return object.material.emission;
+    }
+
+    curRayPath[depth] = p; 
     // 直接光照
     // 这个点 四面八方来的光 和brdf作用后的结果
     // 蒙特卡洛 半球面上的积分 约等于 半球面上 N个采样点求和平均
     //    采样方式就是pdf
     var L_dir_3 = shade_direct(p, scene, object, N);
 
-
-    // 间接光照
-    var L_indir_3 = vec3.fromValues(0, 0, 0);
-     
+     // 间接光照
+     var L_indir_3 = vec3.fromValues(0, 0, 0);
+        
      // 1. 半球面上采样
      // 2. 发射条光线，看是否 和物体相交（如果和光源相交 则不用处理，直接用直接光照就行）
      //     使用pdf 在 范围内随机采用
      // 2.1 把交点假象一个新的光源 再次计算
      // 3. 结束条件 使用俄罗斯轮盘赌
-
-    const RussianRoulette = 0.8;
-    var P_RR = Math.random();
-    if (P_RR < RussianRoulette) {
-        // 如果没有通过 则不用计算间接光照
-
-        var wi_dir =  random_sephere(N);
-        var pdf_wi = 1 / (2 *Math.PI)
-        var p_3 = p;
-    
-        var rayOrig = getHitPointWithEpsilon(p_3, mul3(-1,wi_dir), N);
-        var payload = trace(rayOrig, wi_dir, scene);
-        if (payload) {
-            // 通过emission来判断是否是光源
-            if (payload.hitobj.material && payload.hitobj.material.emission) {
-                // 交点是光源，不用处理
-            } else {
-                // 采样一个点 就不需要除 采样数量 N
-                // L_indir =  Li * fr * cosine / pdf(wi)
-                // 间接光照可以认为是， 交点处发过来了一条光线, 使用shade计算光线的能量
+     const RussianRoulette = 0.8;
+     var P_RR = Math.random();
+     if (P_RR < RussianRoulette) {
+         // 如果没有通过俄罗斯轮盘赌, 则不用继续计算间接光照
+         var wi_dir = random_sephere(N);
+         var pdf_wi = 1 / (2 *Math.PI)
+         var p_3 = p;
+     
+         var rayOrig = getHitPointWithEpsilon(p_3, mul3(-1,wi_dir), N);
+         var payload = trace(rayOrig, wi_dir, scene);
+         if (payload) {
+             // 通过emission来判断是否是光源
+             if (payload.hitobj.material && payload.hitobj.material.emission) {
+                 // 交点是光源，不用处理
+             } else {
+                 // 采样一个点 就不需要除 采样数量 N
+                 // L_indir =  Li * fr * cosine / pdf(wi)
+                 // 间接光照可以认为是， 交点处发过来了一条光线
+                 // 所以方向就是 -wi_dir
                 var hitPoint = add3(p_3 , mul3(payload.tnear, wi_dir));
                 // 计算假设的光源的能量
-                var Li_3 = shade(hitPoint, scene, payload.hitobj, mul3(-1, wi_dir));
+                // var Li_3 = castPath(hitPoint, mul3(-1, wi_dir), scene, depth + 1)
+                //  var Li_3 = castPath(hitPoint, mul3(-1, wi_dir), scene, depth + 1)
+                var item = {
+                    position : hitPoint,
+                    index : payload.index
+                }        
+                var res = payload.hitobj.getSurfaceProperties(item);
+                var Li_3 = shade(hitPoint, scene, payload.hitobj, res.normal, depth + 1);
                 
-                // 漫反射均匀分布，在半球面上，每个方向的漫反射相同
-                var fr_3 = mul3(1 / (1 * Math.PI), object.diffuseColor)
-        
-                // 当前位置光线和法线的夹角
-                // 光线方向 一般都用指向光源来计算
-                var cosin = dot_product3(wi_dir, N);
-        
-                var result = vec3.create();
-                vec3.multiply(result, Li_3, fr_3);
-        
-                L_indir_3 = mul3(cosin / pdf_wi / P_RR, result);
+                 // 漫反射均匀分布，在半球面上，每个方向的漫反射相同
+                 var fr_3 = mul3(1 / ( Math.PI), object.diffuseColor)
+                // var fr_3 = object.eval(undefined, wi_dir, N);
+         
+                 // 当前位置光线和法线的夹角
+                 // 光线方向 一般都用指向光源来计算
+                 var cosin = dot_product3(wi_dir, N);
+                 if (cosin <= 0) {
+                    fr_3 = [0,0,0]
+                 }
+         
+                 var result = vec3.create();
+                 vec3.multiply(result, Li_3, fr_3);
+         
+                 L_indir_3 = mul3((cosin / pdf_wi) / RussianRoulette, result);
+     
+             }
+         }
+     } else {
+         if (curRayPath.length > lastRayPath.length) {
+            for (let i = 0; i < curRayPath.length; i ++) {
+                lastRayPath[i] = curRayPath[i]
             }
-        }
-    }
-
+            curRayPath = []
+         }
+     }
     return add3(L_dir_3, L_indir_3);
 }
 
 
 /**
- * orig 是光线起点
- * dir 是光线的方向
+ * orig 是光线起点, 眼睛位置
+ * dir 是光线的方向， 观察点- 眼睛位置
  * scene [] 包含场景内所有的物体
- * depth 是递归调用的次数
+ * 
  */ 
-function castPath(orig, dir, scene, depth) {
-
-    if (depth > 10) {
-        return [0, 0, 0];
-    }
-
-    var hitColor = BACKGROUND_COLOR;
+function castPath(orig, dir, scene, nouse) {
+    var hitColor = [0,0,0];
     var payload = trace(orig, dir, scene);
     if (payload) {
         let object = payload.hitobj;
-        if (object.material && object.material.emission) {
-            // hit到了光源, 直接返回光源的颜色
-            return object.material.emission;
-        }
 
         // 计算光线和物体相交的位置
         // p = O + t * D
@@ -260,12 +281,8 @@ function castPath(orig, dir, scene, depth) {
 
         var res = object.getSurfaceProperties(item);
         var N = res.normal; // normal
-  
-       
-        return shade(hitPoint, scene, object, N);
+        return shade(hitPoint, scene, object, N, 0);
     }
-      
-
 
 
     return hitColor;

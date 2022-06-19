@@ -39,6 +39,16 @@ class MeshObject {
     setMaterial(m) {
         this.material = m
     }
+    // 给定一对入射、出射方向与法向量，计算这种情况下的 f_r 值
+    eval(wi, wo, N) {
+        var cosalpha = dot_product3(N, wo);
+        if (cosalpha > 0.0) {
+            var diffuse = this.diffuseColor / Math.PI;
+            return diffuse;
+        }
+        else
+            return [0,0,0];
+    }
 }
 
 function triangle_sample_pdf(v0, v1, v2) {
